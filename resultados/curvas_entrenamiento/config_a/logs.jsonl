@@ -1,0 +1,4 @@
+{"loss": 0.8777, "grad_norm": 2.3635151386260986, "learning_rate": 1.4285714285714285e-05, "epoch": 0.006557377049180328, "step": 1}
+{"evento": "verificacion_actualizacion", "step": 2, "lora_b_no_cero": true}
+{"loss": 0.6758, "grad_norm": 1.3083043098449707, "learning_rate": 7.142857142857143e-05, "epoch": 0.03278688524590164, "step": 5}
+{"loss": 0.4416, "grad_norm": 0.8187523484230042, "learning_rate": 0.00014285714285714287, "epoch": 0.06557377049180328, "step": 10}

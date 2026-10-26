@@ -1,0 +1,46 @@
+{
+  "estado": "fallido",
+  "motivo": "Loss y grad_norm no finitas desde el inicio; filtro Trainer mostraba loss0 sin aprendizaje",
+  "config": {
+    "model": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+    "revision": "2e1fd397ee46e1388853d2af2c993145b0f1098a",
+    "dataset": "datos/entrenamiento/aceptados.jsonl",
+    "seed": 2026,
+    "rank": 8,
+    "alpha": 16,
+    "dropout": 0.05,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ],
+    "epochs": 3,
+    "batch_size": 1,
+    "gradient_accumulation": 16,
+    "learning_rate": 0.0002,
+    "max_length": 2048,
+    "output_dir": "adapters_experimentos/config_a",
+    "optimizer": "adamw_torch",
+    "scheduler": "cosine",
+    "warmup_ratio": 0.03,
+    "weight_decay": 0.01,
+    "quantization": {
+      "bits": 4,
+      "type": "nf4",
+      "double_quant": true,
+      "compute_dtype": "float16"
+    },
+    "gradient_checkpointing": true,
+    "fp16": true,
+    "attention": "eager"
+  },
+  "paso_checkpoint": 153,
+  "dataset_sha256": "c730b3dc337089a81322dd5724493514ee8007b55ce5dfc591ff6e7eb4bc253e",
+  "observacion": "Interrumpido por Codex al detectar NaN; no adapter final valido. No continuar desde checkpoint.",
+  "ultimo_paso_observado": 155,
+  "tiempo_entrenador_observado": "27:21"
+}

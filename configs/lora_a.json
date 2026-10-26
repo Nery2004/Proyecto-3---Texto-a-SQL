@@ -32,5 +32,6 @@
     "compute_dtype": "float16"
   },
   "gradient_checkpointing": true,
-  "fp16": true
+  "fp16": true,
+  "attention": "sdpa"
 }

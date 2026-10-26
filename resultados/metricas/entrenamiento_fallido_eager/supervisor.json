@@ -1,0 +1,9 @@
+{
+  "estado": "abortado",
+  "fase": "esperando_A",
+  "pid_A": 19968,
+  "inicio_utc": "2026-10-26T00:27:03.568326+00:00",
+  "actualizado_utc": "2026-10-26T00:49:03.896464+00:00",
+  "segundos_supervisor": 1320.3276784999907,
+  "motivo": "A eager FP16 no finito; supervisor detenido antes B"
+}

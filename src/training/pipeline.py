@@ -2,6 +2,7 @@
 import csv
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import time
@@ -50,7 +51,7 @@ def train(config_path):
     import torch
     from datasets import Dataset
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, Trainer, TrainingArguments, set_seed
+    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, Trainer, TrainerCallback, TrainingArguments, set_seed
     if not torch.cuda.is_available():
         raise RuntimeError('QLoRA requiere GPU CUDA; ejecutar notebook en Colab T4')
     os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG', ':4096:8')
@@ -73,7 +74,7 @@ def train(config_path):
         encoded = Dataset.from_list([encode_example(r, tokenizer, cfg['max_length']) for r in records])
         q = cfg['quantization']
         quant = BitsAndBytesConfig(load_in_4bit=q['bits'] == 4, bnb_4bit_quant_type=q['type'], bnb_4bit_use_double_quant=q['double_quant'], bnb_4bit_compute_dtype=getattr(torch, q['compute_dtype']))
-        model = AutoModelForCausalLM.from_pretrained(cfg['model'], revision=cfg['revision'], device_map={'': 0}, torch_dtype=torch.float16, quantization_config=quant, attn_implementation='eager')
+        model = AutoModelForCausalLM.from_pretrained(cfg['model'], revision=cfg['revision'], device_map={'': 0}, torch_dtype=torch.float16, quantization_config=quant, attn_implementation=cfg['attention'])
         model.config.use_cache = False
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=cfg['gradient_checkpointing'])
         model = get_peft_model(model, LoraConfig(r=cfg['rank'], lora_alpha=cfg['alpha'], lora_dropout=cfg['dropout'], target_modules=cfg['target_modules'], bias='none', task_type='CAUSAL_LM'))
@@ -84,8 +85,38 @@ def train(config_path):
             length = max(len(x['input_ids']) for x in batch)
             return {key: torch.tensor([x[key] + [(-100 if key == 'labels' else tokenizer.pad_token_id if key == 'input_ids' else 0)] * (length - len(x[key])) for x in batch]) for key in ('input_ids', 'attention_mask', 'labels')}
 
-        args = TrainingArguments(output_dir=str(output / 'checkpoints'), num_train_epochs=cfg['epochs'], per_device_train_batch_size=cfg['batch_size'], gradient_accumulation_steps=cfg['gradient_accumulation'], learning_rate=cfg['learning_rate'], lr_scheduler_type=cfg['scheduler'], warmup_ratio=cfg['warmup_ratio'], optim=cfg['optimizer'], weight_decay=cfg['weight_decay'], fp16=cfg['fp16'], gradient_checkpointing=cfg['gradient_checkpointing'], logging_steps=5, save_strategy='epoch', save_total_limit=1, seed=cfg['seed'], data_seed=cfg['seed'], report_to='none', dataloader_num_workers=0, remove_unused_columns=False)
-        trainer = Trainer(model=model, args=args, train_dataset=encoded, data_collator=collate)
+        class FiniteTrainer(Trainer):
+            def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+                result = super().compute_loss(model, inputs, return_outputs=return_outputs, num_items_in_batch=num_items_in_batch)
+                loss = result[0] if return_outputs else result
+                if not bool(torch.isfinite(loss).all()):
+                    raise FloatingPointError('Loss no finita: ejecución invalidada; no se guardará adapter final')
+                return result
+
+        class AuditCallback(TrainerCallback):
+            def on_step_end(self, args, state, control, **kwargs):
+                # Warmup starts at LR=0, so the first update can legitimately be zero.
+                if state.global_step == 2:
+                    changed = any(bool(torch.count_nonzero(p)) for name, p in kwargs['model'].named_parameters() if 'lora_B' in name)
+                    record = {'evento': 'verificacion_actualizacion', 'step': state.global_step, 'lora_b_no_cero': changed}
+                    with (logdir / 'logs.jsonl').open('a', encoding='utf-8') as stream:
+                        stream.write(json.dumps(record) + '\n')
+                        stream.flush()
+                    if not changed:
+                        raise FloatingPointError('LoRA B sigue en cero después del segundo paso optimizador')
+
+            def on_log(self, args, state, control, logs=None, **kwargs):
+                record = dict(logs or {}, step=state.global_step)
+                nonfinite = [key for key in ('loss', 'grad_norm') if key in record and not math.isfinite(float(record[key]))]
+                safe = {k: str(v) if isinstance(v, float) and not math.isfinite(v) else v for k, v in record.items()}
+                with (logdir / 'logs.jsonl').open('a', encoding='utf-8') as stream:
+                    stream.write(json.dumps(safe, allow_nan=False) + '\n')
+                    stream.flush()
+                if nonfinite:
+                    raise FloatingPointError(f'Métricas no finitas: {nonfinite}; entrenamiento invalidado')
+
+        args = TrainingArguments(output_dir=str(output / 'checkpoints'), num_train_epochs=cfg['epochs'], per_device_train_batch_size=cfg['batch_size'], gradient_accumulation_steps=cfg['gradient_accumulation'], learning_rate=cfg['learning_rate'], lr_scheduler_type=cfg['scheduler'], warmup_ratio=cfg['warmup_ratio'], optim=cfg['optimizer'], weight_decay=cfg['weight_decay'], fp16=cfg['fp16'], gradient_checkpointing=cfg['gradient_checkpointing'], logging_steps=5, logging_first_step=True, logging_nan_inf_filter=False, save_strategy='epoch', save_total_limit=1, seed=cfg['seed'], data_seed=cfg['seed'], report_to='none', dataloader_num_workers=0, remove_unused_columns=False)
+        trainer = FiniteTrainer(model=model, args=args, train_dataset=encoded, data_collator=collate, callbacks=[AuditCallback()])
         torch.cuda.reset_peak_memory_stats()
         result = trainer.train()
         model.save_pretrained(output, safe_serialization=True)
@@ -99,8 +130,9 @@ def train(config_path):
         (output / 'run.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding='utf-8')
         if trainer is not None:
             history = trainer.state.log_history
-            (logdir / 'history.json').write_text(json.dumps(history, indent=2), encoding='utf-8')
-            losses = [x for x in history if 'loss' in x]
+            safe_history = [{k: str(v) if isinstance(v, float) and not math.isfinite(v) else v for k, v in row.items()} for row in history]
+            (logdir / 'history.json').write_text(json.dumps(safe_history, indent=2, allow_nan=False), encoding='utf-8')
+            losses = [x for x in history if 'loss' in x and math.isfinite(float(x['loss']))]
             if losses:
                 with (logdir / 'loss.csv').open('w', newline='', encoding='utf-8') as stream:
                     writer = csv.DictWriter(stream, fieldnames=['step', 'epoch', 'loss'])

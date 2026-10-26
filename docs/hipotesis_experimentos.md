@@ -14,3 +14,13 @@ La pérdida se calcula únicamente sobre respuesta SQL; los tokens de esquema/pr
 Comparación: ejecutar baseline antes de entrenar; ejecutar A y B en procesos separados sobre la misma T4 y el mismo archivo de datos, verificar SHA256 registrado. Usar prompt compartido con inferencia, generación greedy y mismo protocolo de evaluación. Evaluar EX ponderada, categorías de error, latencias, VRAM y pérdida. Elegir adapter por EX observada respetando tiempo; documentar empate por latencia/memoria. La validación propia debe ser revisada por estudiantes antes de atribuir autoría humana.
 
 Los experimentos no tienen resultados todavía. Las curvas se producen solamente a partir de trainer.state.log_history. Un fallo guarda run.json con estado fallido; no crea un adapter final ficticio. Los adapters no se copian automáticamente a adapter/: elegir después de evaluación real.
+
+## Corrección numérica antes de las ejecuciones válidas A/B
+
+La primera tentativa A con atención eager y AMP FP16 se interrumpió al inspeccionar el primer checkpoint: grad_norm=NaN desde el paso5, learning_rate=0 y loss=0 por el filtro por defecto de Trainer. Esos ceros no representan aprendizaje. Se conserva evidencia en adapters_experimentos/fallidos y resultados/metricas; no se seleccionan esos pesos.
+
+El diagnóstico real reprodujo NaN forward/backward en tres ejemplos (incluido el más largo) con eager FP16. Se prueba SDPA FP16, conservando NF4, dataset, seed y todos los hiperparámetros; la misma corrección se aplica a A y B antes de reiniciar ambos desde el modelo base. SDPA es la atención por defecto ya usada en la inferencia del baseline. El único factor experimental válido sigue siendo rank8/rank16.
+
+Ahora se desactiva logging_nan_inf_filter, se registra el primer paso, se guarda JSONL con flush y se aborta ante pérdida o grad_norm no finitos. No se convierte NaN en pérdida cero. [Transformers debugging](https://github.com/huggingface/transformers/blob/main/docs/source/en/debugging.md) documenta el riesgo de NaN al pasar modelos preentrenados BF16 a FP16; la causa concreta eager/SDPA aquí se contrasta con el diagnóstico local, no se atribuye únicamente a esa recomendación general.
+
+El backend SDPA emite una advertencia de backward no determinista con `warn_only=True`. Se mantienen semilla, revisión, orden, parámetros y software para reproducir el procedimiento; no se garantiza identidad bit a bit del entrenamiento CUDA. Esta limitación se aplica por igual a A y B. La generación greedy sin dropout se comprueba por separado y no usa backward.

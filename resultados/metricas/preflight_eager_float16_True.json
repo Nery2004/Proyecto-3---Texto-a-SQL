@@ -1,0 +1,32 @@
+{
+  "attention": "eager",
+  "compute_dtype": "float16",
+  "amp": true,
+  "estado": "completado",
+  "batches": [
+    {
+      "id": "universidad-00001",
+      "tokens": 381,
+      "loss": "nan",
+      "grad_norm": "nan",
+      "finito": false
+    },
+    {
+      "id": "universidad-00122",
+      "tokens": 387,
+      "loss": "nan",
+      "grad_norm": "nan",
+      "finito": false
+    },
+    {
+      "id": "hospital-00203",
+      "tokens": 469,
+      "loss": "nan",
+      "grad_norm": "nan",
+      "finito": false
+    }
+  ],
+  "todos_finitos": false,
+  "vram_max_bytes": 3079853056,
+  "segundos": 9.56204859999707
+}

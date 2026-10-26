@@ -1,0 +1,35 @@
+{
+  "attention": "sdpa",
+  "compute_dtype": "float16",
+  "amp": true,
+  "estado": "completado",
+  "batches": [
+    {
+      "id": "universidad-00001",
+      "tokens": 381,
+      "loss": 0.21577072143554688,
+      "grad_norm": 3.098789930343628,
+      "finito": true,
+      "lora_b_no_cero_tras_optimizer": true
+    },
+    {
+      "id": "universidad-00122",
+      "tokens": 387,
+      "loss": 0.019881773740053177,
+      "grad_norm": 0.2718742787837982,
+      "finito": true,
+      "lora_b_no_cero_tras_optimizer": true
+    },
+    {
+      "id": "hospital-00203",
+      "tokens": 469,
+      "loss": 0.3747493624687195,
+      "grad_norm": 1.3541312217712402,
+      "finito": true,
+      "lora_b_no_cero_tras_optimizer": true
+    }
+  ],
+  "todos_finitos": true,
+  "vram_max_bytes": 3153143296,
+  "segundos": 10.123828700001468
+}
