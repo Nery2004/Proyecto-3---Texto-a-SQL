@@ -1,0 +1,3 @@
+CREATE TABLE salones (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, capacidad INT, tarifa DECIMAL(10,2)) COMMENT='Dominio reservaciones: salones';
+CREATE TABLE organizadores (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, credito DECIMAL(10,2)) COMMENT='Dominio reservaciones: organizadores';
+CREATE TABLE eventos (id INT PRIMARY KEY COMMENT 'Identificador único', salon_id INT, organizador_id INT, asistentes INT, fecha DATE, FOREIGN KEY (salon_id) REFERENCES salones(id), FOREIGN KEY (organizador_id) REFERENCES organizadores(id)) COMMENT='Dominio reservaciones: eventos';

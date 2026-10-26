@@ -1,0 +1,5 @@
+CREATE TABLE departments (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, presupuesto DECIMAL(10,2)) COMMENT='Dominio rrhh: departments';
+CREATE TABLE employees (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, department_id INT, salario DECIMAL(10,2), edad INT, FOREIGN KEY (department_id) REFERENCES departments(id)) COMMENT='Dominio rrhh: employees';
+CREATE TABLE projects (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, presupuesto DECIMAL(10,2)) COMMENT='Dominio rrhh: projects';
+CREATE TABLE assignments (id INT PRIMARY KEY COMMENT 'Identificador único', employee_id INT, project_id INT, horas INT, fecha DATE, FOREIGN KEY (employee_id) REFERENCES employees(id), FOREIGN KEY (project_id) REFERENCES projects(id)) COMMENT='Dominio rrhh: assignments';
+CREATE TABLE bonuses (id INT PRIMARY KEY COMMENT 'Identificador único', employee_id INT, monto DECIMAL(10,2), fecha DATE, FOREIGN KEY (employee_id) REFERENCES employees(id)) COMMENT='Dominio rrhh: bonuses';

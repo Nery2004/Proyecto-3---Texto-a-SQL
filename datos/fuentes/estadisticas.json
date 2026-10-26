@@ -1,0 +1,68 @@
+{
+  "entrenamiento": {
+    "propuestos": 2262,
+    "aceptados": 2262,
+    "descartados": 0,
+    "por_dificultad": {
+      "facil": 582,
+      "media": 1253,
+      "dificil": 427
+    },
+    "por_esquema": {
+      "universidad": 227,
+      "hospital": 272,
+      "banco": 181,
+      "tienda": 290,
+      "inventarios": 181,
+      "restaurante": 216,
+      "biblioteca": 225,
+      "transporte": 216,
+      "rrhh": 283,
+      "reservaciones": 171
+    },
+    "por_tipo_consulta": {
+      "filtro": 450,
+      "agregacion": 400,
+      "agregacion_filtrada": 600,
+      "subconsulta": 82,
+      "ventana": 139,
+      "cte": 50,
+      "comparacion": 22,
+      "having": 32,
+      "join": 32,
+      "group_by": 156,
+      "join_agregacion": 156,
+      "fecha": 143
+    }
+  },
+  "validacion": {
+    "propuestos": 463,
+    "aceptados": 463,
+    "descartados": 0,
+    "por_dificultad": {
+      "facil": 126,
+      "media": 251,
+      "dificil": 86
+    },
+    "por_esquema": {
+      "hoteleria": 225,
+      "manufactura": 238
+    },
+    "por_tipo_consulta": {
+      "filtro": 90,
+      "agregacion": 80,
+      "agregacion_filtrada": 120,
+      "subconsulta": 16,
+      "ventana": 28,
+      "cte": 10,
+      "comparacion": 4,
+      "having": 6,
+      "join": 6,
+      "group_by": 32,
+      "join_agregacion": 32,
+      "fecha": 39
+    }
+  },
+  "descartes_por_motivo": {},
+  "revision_semantica_humana": "pendiente; ejecución correcta no prueba equivalencia semántica"
+}

@@ -1,0 +1,4 @@
+CREATE TABLE almacenes (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, capacidad INT) COMMENT='Dominio inventarios: almacenes';
+CREATE TABLE proveedores (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, credito DECIMAL(10,2)) COMMENT='Dominio inventarios: proveedores';
+CREATE TABLE articulos (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, proveedor_id INT, costo DECIMAL(10,2), FOREIGN KEY (proveedor_id) REFERENCES proveedores(id)) COMMENT='Dominio inventarios: articulos';
+CREATE TABLE existencias (id INT PRIMARY KEY COMMENT 'Identificador único', almacen_id INT, articulo_id INT, unidades INT, fecha DATE, FOREIGN KEY (almacen_id) REFERENCES almacenes(id), FOREIGN KEY (articulo_id) REFERENCES articulos(id)) COMMENT='Dominio inventarios: existencias';

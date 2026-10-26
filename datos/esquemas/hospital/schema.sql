@@ -1,0 +1,5 @@
+CREATE TABLE especialidades (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT) COMMENT='Dominio hospital: especialidades';
+CREATE TABLE medicos (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, especialidad_id INT, salario DECIMAL(10,2), FOREIGN KEY (especialidad_id) REFERENCES especialidades(id)) COMMENT='Dominio hospital: medicos';
+CREATE TABLE pacientes (id INT PRIMARY KEY COMMENT 'Identificador único', nombre TEXT, edad INT, peso DECIMAL(10,2)) COMMENT='Dominio hospital: pacientes';
+CREATE TABLE consultas (id INT PRIMARY KEY COMMENT 'Identificador único', medico_id INT, paciente_id INT, costo DECIMAL(10,2), fecha DATE, FOREIGN KEY (medico_id) REFERENCES medicos(id), FOREIGN KEY (paciente_id) REFERENCES pacientes(id)) COMMENT='Dominio hospital: consultas';
+CREATE TABLE recetas (id INT PRIMARY KEY COMMENT 'Identificador único', consulta_id INT, dosis INT, precio DECIMAL(10,2), FOREIGN KEY (consulta_id) REFERENCES consultas(id)) COMMENT='Dominio hospital: recetas';
