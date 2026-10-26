@@ -1,4 +1,4 @@
-﻿# Datos propios y ejecución MySQL
+# Datos propios y ejecución MySQL
 
 Los dominios se definen en `src/data/generate.py`. Se generan 10 esquemas de entrenamiento (universidad, hospital, banco, tienda, inventarios, restaurante, biblioteca, transporte, rrhh y reservaciones) y 2 completamente separados (hotelería y manufactura). Los grafos tienen 3–5 tablas y relaciones distintas, con 12 filas deterministas por tabla. Las cifras exactas se registran en `datos/fuentes/estadisticas.json`.
 
@@ -14,3 +14,5 @@ Las preguntas y consultas son propuestas originales de Codex a partir de plantil
 Los registros JSONL contienen id, schema_id, DDL, pregunta, SQL, dificultad, tipo, origen, estado de validación, exigencia de orden y estado de revisión humana. Solo los archivos `aceptados.jsonl` pasan al entrenamiento. Cada aceptado identifica versión y fecha UTC de ejecución. La separación se hace por dominio completo, sin compartir schema_id entre conjuntos. Las consultas con errores se conservan en `datos/descartes/descartes.jsonl` con clasificación y mensaje real.
 
 Para evaluación, `src.data.mysql.MySQLExecutor(schema_id)` funciona como callback y devuelve `ok`, `columnas`, `filas` y `error`; permite `with` y `.close()`. Usa las mismas variables y conserva la conexión. Las limitaciones son fixtures pequeños, propuestas sintéticas, ausencia de autoría estudiantil confirmada y revisión semántica pendiente.
+
+Ejecuci?n realizada: MySQL 8.4.10 en Docker, con todas las consultas aceptadas ejecutadas realmente. `datos/fuentes/mysql_evidence.json` conserva versi?n, sql_mode, privilegios SELECT y hashes SHA-256 del snapshot validado. La plantilla `datos/validacion/revision_humana.csv` deja en blanco autor, fecha y redacci?n humana.

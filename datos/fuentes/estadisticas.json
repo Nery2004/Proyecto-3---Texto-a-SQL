@@ -1,66 +1,72 @@
 {
   "entrenamiento": {
-    "propuestos": 2262,
-    "aceptados": 2262,
+    "propuestos": 2440,
+    "aceptados": 2440,
     "descartados": 0,
     "por_dificultad": {
-      "facil": 582,
-      "media": 1253,
-      "dificil": 427
+      "facil": 161,
+      "media": 1327,
+      "dificil": 952
     },
     "por_esquema": {
-      "universidad": 227,
-      "hospital": 272,
-      "banco": 181,
-      "tienda": 290,
-      "inventarios": 181,
-      "restaurante": 216,
-      "biblioteca": 225,
-      "transporte": 216,
-      "rrhh": 283,
-      "reservaciones": 171
+      "universidad": 273,
+      "hospital": 300,
+      "banco": 168,
+      "tienda": 332,
+      "inventarios": 179,
+      "restaurante": 222,
+      "biblioteca": 249,
+      "transporte": 233,
+      "rrhh": 300,
+      "reservaciones": 184
     },
     "por_tipo_consulta": {
-      "filtro": 450,
+      "filtro": 150,
       "agregacion": 400,
-      "agregacion_filtrada": 600,
+      "agregacion_filtrada": 200,
       "subconsulta": 82,
       "ventana": 139,
       "cte": 50,
+      "agregacion_por_atributo": 420,
+      "having_subconsulta": 420,
+      "conteo_distinto": 105,
+      "dispersion": 210,
       "comparacion": 22,
       "having": 32,
       "join": 32,
-      "group_by": 156,
       "join_agregacion": 156,
-      "fecha": 143
+      "fecha": 22
     }
   },
   "validacion": {
-    "propuestos": 463,
-    "aceptados": 463,
+    "propuestos": 478,
+    "aceptados": 478,
     "descartados": 0,
     "por_dificultad": {
-      "facil": 126,
-      "media": 251,
-      "dificil": 86
+      "facil": 33,
+      "media": 259,
+      "dificil": 186
     },
     "por_esquema": {
-      "hoteleria": 225,
-      "manufactura": 238
+      "hoteleria": 227,
+      "manufactura": 251
     },
     "por_tipo_consulta": {
-      "filtro": 90,
+      "filtro": 30,
       "agregacion": 80,
-      "agregacion_filtrada": 120,
+      "agregacion_filtrada": 40,
       "subconsulta": 16,
       "ventana": 28,
       "cte": 10,
+      "agregacion_por_atributo": 80,
+      "having_subconsulta": 80,
+      "conteo_distinto": 20,
+      "dispersion": 40,
       "comparacion": 4,
       "having": 6,
       "join": 6,
-      "group_by": 32,
       "join_agregacion": 32,
-      "fecha": 39
+      "fecha": 6
     }
   },
   "descartes_por_motivo": {},

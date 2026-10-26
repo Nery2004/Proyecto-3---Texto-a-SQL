@@ -18,7 +18,7 @@
     "GRANT SELECT ON `textsql_universidad`.* TO `textsql_reader`@`%`"
   ],
   "datasets": {
-    "datos\\entrenamiento\\aceptados.jsonl": "dc316508f9c81e33538e69181c32cfdfff9dac300dfb978b66ad387edfbbd241",
-    "datos\\validacion\\aceptados.jsonl": "a54958d5cbe924c0a91f52a46c3869933ac2fea06bb101235e16ad85c3eac9aa"
+    "datos\\entrenamiento\\aceptados.jsonl": "159cd2c0050ee3ec8daabf51a1f64474e3e2a60edb89de2746ecde5857d734df",
+    "datos\\validacion\\aceptados.jsonl": "df7e367fe9c34bd96340a6399b8ee9185d8a8ef340996f94d799b81226cf3d06"
   }
 }

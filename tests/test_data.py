@@ -1,5 +1,6 @@
-﻿"""Dataset invariants; execution evidence is checked separately from unit generation."""
+"""Dataset invariants; execution evidence is checked separately from unit generation."""
 import json
+import re
 from pathlib import Path
 import pytest
 from src.data.generate import DOMAINS,candidates,schema_sql,fixtures
@@ -18,8 +19,9 @@ def test_candidates_are_reproducible_and_diverse():
     assert len(rows)>=2000
     assert len({(r['schema_id'],r['sql']) for r in rows})==len(rows)
     assert len({r['id'] for r in rows})==len(rows)
+    assert len({(r['schema_id'],re.sub(r"'[^']*'|\b\d+\b",'?',r['sql'])) for r in rows})==len(rows)
     assert {r['dificultad'] for r in rows}=={'facil','media','dificil'}
-    assert {'join','group_by','having','cte','ventana','fecha','subconsulta'} <= {r['tipo_consulta'] for r in rows}
+    assert {'join','agregacion_por_atributo','having','cte','ventana','fecha','subconsulta'} <= {r['tipo_consulta'] for r in rows}
     assert all(r['validado'] is False for r in rows)
 
 def test_validation_human_authorship_not_fabricated():

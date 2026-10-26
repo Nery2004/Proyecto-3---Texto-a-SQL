@@ -69,11 +69,20 @@ def candidates(schema_id):
             for threshold in [20,50,80]:
                 for fn,word in [('COUNT','cantidad'),('SUM','suma'),('AVG','promedio'),('MAX','m?ximo')]:
                     expr='*' if fn=='COUNT' else n
-                    add(f'Calcula {word} de {n} entre los registros de {table} donde {n} supera {threshold}.',f'SELECT {fn}({expr}) AS valor FROM {table} WHERE {n} > {threshold}','media','agregacion_filtrada')
+                    add(f'Calcula {word} de '+('registros' if fn=='COUNT' else n)+f' entre los registros de {table} donde {n} supera {threshold}.',f'SELECT {fn}({expr}) AS valor FROM {table} WHERE {n} > {threshold}','media','agregacion_filtrada')
             add(f'Muestra id y {n} de {table} por encima de su promedio.',f'SELECT id, {n} FROM {table} WHERE {n} > (SELECT AVG({n}) FROM {table})','dificil','subconsulta')
             add(f'Clasifica los registros de {table} por {n} descendente asignando rango a los empates.',f'SELECT id, {n}, DENSE_RANK() OVER (ORDER BY {n} DESC) AS rango FROM {table}','dificil','ventana')
             add(f'Calcula la suma acumulada de {n} en {table}, siguiendo el orden de id.',f'SELECT id, SUM({n}) OVER (ORDER BY id ROWS UNBOUNDED PRECEDING) AS acumulado FROM {table}','dificil','ventana')
             add(f'Usando una CTE, lista id de {table} cuyo {n} supera su promedio.',f'WITH promedio AS (SELECT AVG({n}) AS valor FROM {table}) SELECT t.id FROM {table} t CROSS JOIN promedio p WHERE t.{n} > p.valor','dificil','cte')
+        for n in numeric:
+            for group,typ in cols:
+                if group==n: continue
+                for fn,word in [('AVG','promedio'),('SUM','suma'),('MAX','m?ximo'),('MIN','m?nimo')]:
+                    add(f'Calcula el {word} de {n} para cada valor distinto de {group} en {table}.',f'SELECT {group}, {fn}({n}) AS valor FROM {table} GROUP BY {group}','media','agregacion_por_atributo')
+                    add(f'?Qu? valores de {group} en {table} tienen un {word} de {n} superior al promedio global de {n}?',f'SELECT {group}, {fn}({n}) AS valor FROM {table} GROUP BY {group} HAVING {fn}({n}) > (SELECT AVG({n}) FROM {table})','dificil','having_subconsulta')
+                add(f'Calcula cu?ntos valores distintos de {n} existen para cada {group} en {table}.',f'SELECT {group}, COUNT(DISTINCT {n}) AS distintos FROM {table} GROUP BY {group}','media','conteo_distinto')
+                add(f'Calcula el rango entre m?ximo y m?nimo de {n} para cada {group} en {table}.',f'SELECT {group}, MAX({n}) - MIN({n}) AS rango FROM {table} GROUP BY {group}','media','dispersion')
+                add(f'Calcula la desviaci?n est?ndar poblacional de {n} para cada {group} en {table}.',f'SELECT {group}, STDDEV_POP({n}) AS desviacion FROM {table} GROUP BY {group}','dificil','dispersion')
         for a,b in combinations(numeric,2):
             for op,label in [('>','supera'),('<','es menor que')]:
                 add(f'Lista id, {a} y {b} de {table} donde {a} {label} {b}.',f'SELECT id, {a}, {b} FROM {table} WHERE {a} {op} {b}','media','comparacion')
@@ -92,7 +101,15 @@ def candidates(schema_id):
                 add(f'Cuenta los registros de {table} por año y mes de {fk}.',f'SELECT YEAR({fk}) AS anio, MONTH({fk}) AS mes, COUNT(*) AS cantidad FROM {table} GROUP BY YEAR({fk}), MONTH({fk})','media','fecha')
                 for month in range(1,13):
                     add(f'Lista los registros de {table} de {month:02d}/2025.',f"SELECT * FROM {table} WHERE {fk} >= '2025-{month:02d}-01' AND {fk} < DATE_ADD('2025-{month:02d}-01', INTERVAL 1 MONTH)",'facil','fecha')
-    return rows
+    # Literal-only variants are not separate training examples.
+    import re
+    unique=[];seen=set()
+    for row in rows:
+        key=re.sub(r"'[^']*'|\b\d+\b",'?',row['sql'])
+        if key not in seen:
+            row['id']=f'{schema_id}-{len(unique)+1:05d}'
+            unique.append(row);seen.add(key)
+    return unique
 
 def write_jsonl(path,rows):
     Path(path).parent.mkdir(parents=True,exist_ok=True)
