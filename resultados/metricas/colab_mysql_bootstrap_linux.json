@@ -1,0 +1,10 @@
+{
+  "estado": "completado",
+  "exit_code": 0,
+  "fecha_registro_utc": "2026-10-26T00:25:31.547774+00:00",
+  "entorno": "Docker Linux python:3.12-slim Debian13, limite768MiB",
+  "image_digest": "sha256:a0f57064cbdcd6285fa45f51237ab0b35ea8ebaed06a1f5973e89e19dfb86704",
+  "prueba": "scripts.bootstrap_mysql_colab: descarga binario oficial8.4.10, inicializa, arranca, conecta y verificaONLY_FULL_GROUP_BY",
+  "salida_final": "MySQL 8.4.10 local listo. Credenciales solo en .env excluido de Git.",
+  "gpu_T4_verificada": false
+}

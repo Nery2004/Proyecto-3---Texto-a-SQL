@@ -26,6 +26,10 @@ En Linux/Colab usar `python` dentro del entorno y los mismos comandos pip. Los
 tres notebooks permiten empezar desde un ZIP del repositorio privado. Elegir
 GPU T4; sus celdas no ejecutadas no acreditan compatibilidad medida en T4.
 Ver [dependencias](docs/dependencias.md) y [limitaciones](docs/limitaciones.md).
+Los notebooks de datos y evaluación arrancan MySQL 8.4.10 local con
+`python -m scripts.bootstrap_mysql_colab`, usando el binario oficial indicado
+en el PDF. Su arranque fue probado en Linux mediante Docker; falta verificar
+el runtime específico de Colab T4.
 
 ## Base de datos y datos
 
@@ -81,6 +85,18 @@ Después evaluar ambos adapters con el mismo subset y protocolo; copiar el adapt
 elegido completo a `adapter/` únicamente tras comparación real. Los checkpoints
 no son entregables finales. No subir archivos mayores de 100 MB a Git normal:
 usar Git LFS, comprobar descarga en Colab y entregar el ZIP con pesos físicos.
+
+```powershell
+python -m scripts.with_env python -m scripts.evaluate --dataset datos/validacion/evaluacion_48.jsonl --config configs/baseline.json --config configs/inference_a.json --config configs/inference_b.json --strategy ambas
+python -m scripts.select_adapter
+python -m scripts.analyze_results
+python -m scripts.report
+python -m scripts.package_delivery
+```
+
+El ZIP excluye credenciales, cachés, entorno Python y checkpoints. Por defecto
+se niega a empaquetar sin pesos finales; `--allow-partial` identifica expresamente
+un paquete incompleto. La subida a Canvas debe realizarla el estudiante.
 
 ## Evaluación y entregables
 

@@ -1,0 +1,12 @@
+{
+  "estado": "en_curso",
+  "fuente_log": "train-a.log",
+  "actualizado_utc": "2026-10-26T00:25:18.125631+00:00",
+  "paso_observado": 20,
+  "pasos_totales": 456,
+  "segundos_por_paso_observados": 10.57,
+  "tiempo_transcurrido_entrenador": "03:32",
+  "tiempo_restante_estimado_entrenador": "1:16:48",
+  "ultimo_loss_observado": null,
+  "nota": "TQDM y loss reales del log; las estimaciones de tiempo pueden cambiar. Loss null indica stdout aun sin registro visible."
+}
