@@ -93,6 +93,8 @@ def evaluate(examples, generate, executor_factory, *, model="baseline", strategy
                        "sql_referencia": example["sql"], "sql_generado": generated,
                        "ejecucion_ok": bool(actual.get("ok")), "resultado_correcto": bool(correct),
                        "latencia_segundos": elapsed, "llamadas_ejecutar": len(calls),
+                       "consultas_callback": json.dumps(calls, ensure_ascii=False),
+                       "errores_ejecutar": json.dumps(failures, ensure_ascii=False),
                        "errores_callback": len(failures), "limite_cumplido": eligible,
                        "categoria_error": category, "error": error,
                        "revision_humana": not correct and not bool(error) and eligible,
