@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import time
+import faulthandler
 
 
 def main():
@@ -14,6 +15,10 @@ def main():
     os.environ['TEXT2SQL_CONFIG'] = str(Path(args.config).resolve())
     started = time.perf_counter()
     report = {'config': args.config, 'estado': 'iniciado'}
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, indent=2), encoding='utf-8')
+    faulthandler.dump_traceback_later(120, repeat=True)
     try:
         from src.inference.engine import get_runtime
         runtime = get_runtime()
@@ -22,9 +27,8 @@ def main():
         report.update(estado='fallido', error=f'{type(exc).__name__}: {exc}')
         raise
     finally:
+        faulthandler.cancel_dump_traceback_later()
         report['segundos_totales'] = time.perf_counter() - started
-        output = Path(args.output)
-        output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
 
 

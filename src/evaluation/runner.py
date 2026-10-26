@@ -84,7 +84,7 @@ def evaluate(examples, generate, executor_factory, *, model="baseline", strategy
             "ok": False, "columnas": [], "filas": [], "error": error}
         error = error or actual.get("error") or ""
         eligible = elapsed <= time_limit and len(calls) <= 3
-        correct = eligible and compare_results(reference, actual, example.get("orden_importa", False))
+        correct = eligible and compare_results(reference, actual, example.get("orden_importa", example.get("requiere_orden", False)))
         category = "" if correct else ("limite_excedido" if not eligible else
                     error_category(error, example["sql"], generated))
         output.append({"id": example["id"], "schema_id": example["schema_id"],

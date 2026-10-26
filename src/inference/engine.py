@@ -1,4 +1,5 @@
 import functools
+import os
 import threading
 import time
 from pathlib import Path
@@ -10,6 +11,8 @@ REVISION = "2e1fd397ee46e1388853d2af2c993145b0f1098a"
 
 class Runtime:
     def __init__(self, config):
+        os.environ.setdefault('OMP_NUM_THREADS', '1')
+        os.environ.setdefault('MKL_NUM_THREADS', '1')
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, set_seed
         started = time.monotonic()

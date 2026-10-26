@@ -1,0 +1,59 @@
+{
+  "motor": "MySQL 8.4.10",
+  "pruebas": [
+    {
+      "prueba": "join",
+      "ok": true,
+      "filas": 12,
+      "segundos": 0.03742999999667518,
+      "error": null
+    },
+    {
+      "prueba": "group_having",
+      "ok": true,
+      "filas": 12,
+      "segundos": 0.0043227999994996935,
+      "error": null
+    },
+    {
+      "prueba": "subconsulta",
+      "ok": true,
+      "filas": 6,
+      "segundos": 0.004013099998701364,
+      "error": null
+    },
+    {
+      "prueba": "cte",
+      "ok": true,
+      "filas": 1,
+      "segundos": 0.004414499999256805,
+      "error": null
+    },
+    {
+      "prueba": "ventana",
+      "ok": true,
+      "filas": 12,
+      "segundos": 0.00425369999720715,
+      "error": null
+    },
+    {
+      "prueba": "fecha",
+      "ok": true,
+      "filas": 1,
+      "segundos": 0.0037921000039204955,
+      "error": null
+    },
+    {
+      "prueba": "only_full_group_by_rechaza",
+      "ok": true,
+      "error": "1140 (42000): In aggregated query without GROUP BY, expression #1 of SELECT list contains nonaggregated column 'textsql_hospital.consultas.id'; this is incompatible with sql_mode=only_full_group_by"
+    },
+    {
+      "prueba": "permisos_delete_rechazan",
+      "ok": true,
+      "errno": 1142
+    }
+  ],
+  "aprobadas": 8,
+  "fallidas": 0
+}

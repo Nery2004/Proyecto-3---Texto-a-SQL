@@ -11,3 +11,5 @@ Fuentes primarias consultadas el 25 de octubre de 2026:
 - [PEFT cuantización](https://huggingface.co/docs/peft/v0.14.0/developer_guides/quantization): prepare_model_for_kbit_training antes de insertar LoRA.
 
 Esto comprueba compatibilidad declarada, no demuestra una ejecución completa en T4. El notebook instala wheels CUDA 12.4 de PyTorch y requirements, ejecuta pip check e imports reales. Un runtime Colab con paquetes preinstalados incompatibles puede exigir reinicio o runtime limpio. No instalar torchvision/torchaudio: no son dependencias de este proyecto de texto y sus versiones deben corresponder con torch si ya están presentes.
+
+Verificación local real: instalación en un venv Python 3.12 Windows, seguida de `pip check`: `No broken requirements found.` Evidencia en `resultados/metricas/pip_check.txt` y versiones instaladas en `dependencias_instaladas.txt`. La importación del stack GPU y la precarga tienen su evidencia separada; `pip check` no prueba carga CUDA.

@@ -60,6 +60,13 @@ def test_reference_failure_aborts():
         evaluate([EXAMPLE], lambda *a, **k: "SELECT 1",
                  lambda schema: lambda sql: {"ok": False, "error": "missing db"})
 
+def test_dataset_order_flag_is_respected():
+    example = dict(EXAMPLE, requiere_orden=True)
+    def factory(schema):
+        return lambda sql: result([(1,), (2,)]) if sql == 'SELECT 1' else result([(2,), (1,)])
+    records = evaluate([example], lambda *args, **kwargs: 'SELECT 2', factory)
+    assert not records[0]['resultado_correcto']
+
 
 @pytest.mark.parametrize("gold,sql,category", [
     ("SELECT a FROM t JOIN u ON t.id=u.id", "SELECT a FROM t", "join_incorrecto"),

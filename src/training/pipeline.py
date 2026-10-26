@@ -38,6 +38,8 @@ def encode_example(row, tokenizer, max_length):
 
 
 def train(config_path):
+    os.environ.setdefault('OMP_NUM_THREADS', '1')
+    os.environ.setdefault('MKL_NUM_THREADS', '1')
     cfg = json.loads(Path(config_path).read_text(encoding='utf-8'))
     records = load_records(cfg['dataset'])
     heldout = Path('datos/validacion/aceptados.jsonl')
