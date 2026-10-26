@@ -6,6 +6,7 @@ from .config import load_config
 from .prompt import messages
 
 _lock = threading.RLock()
+REVISION = "2e1fd397ee46e1388853d2af2c993145b0f1098a"
 
 class Runtime:
     def __init__(self, config):
@@ -13,11 +14,12 @@ class Runtime:
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, set_seed
         started = time.monotonic()
         set_seed(config["semilla"])
-        self.tokenizer = AutoTokenizer.from_pretrained(config["modelo_base"])
+        revision = REVISION if config["modelo_base"] == "Qwen/Qwen2.5-Coder-1.5B-Instruct" else "main"
+        self.tokenizer = AutoTokenizer.from_pretrained(config["modelo_base"], revision=revision)
         options = {"torch_dtype": torch.float16 if torch.cuda.is_available() else torch.float32}
         if torch.cuda.is_available():
-            options.update(device_map="auto", quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16))
-        self.model = AutoModelForCausalLM.from_pretrained(config["modelo_base"], **options)
+            options.update(device_map={"": 0}, quantization_config=BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.float16))
+        self.model = AutoModelForCausalLM.from_pretrained(config["modelo_base"], revision=revision, **options)
         if config["usar_adapter"]:
             from peft import PeftModel
             self.model = PeftModel.from_pretrained(self.model, config["adapter"])
