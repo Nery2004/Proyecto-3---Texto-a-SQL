@@ -8,12 +8,12 @@
 | Dataset | 2440 aceptados MySQL; revisión semántica pendiente |
 | Validación | 478 propuestas ejecutadas; autoría humana pendiente |
 | Resultados medidos | baseline/directa: EX 0.6250; n=48; media 1.43s; máx 4.45s; fuera límite 0<br>baseline/callback: EX 0.6250; n=48; media 3.40s; máx 25.84s; fuera límite 0 |
-| QLoRA A | LoRA A: no ejecutado; pasos no registrados; tiempo no registrados |
+| QLoRA A | LoRA A: en_curso; pasos no registrados; tiempo no registrados |
 | QLoRA B | LoRA B: no ejecutado; pasos no registrados; tiempo no registrados |
 | Selección | Adapter final pendiente de selección medida |
 | Inferencia | GPU medida: NVIDIA GeForce RTX 4060 Laptop GPU; T4 no verificada |
 | Experimento y errores | Pipeline implementado; resultados dependen de ejecución real |
-| Pruebas | Unitarias: {'aprobadas': 49, 'fallidas': 0, 'omitidas': 0}; integración MySQL: 8 aprobadas |
+| Pruebas | Unitarias: {'aprobadas': 53, 'fallidas': 0, 'omitidas': 0}; integración MySQL: 8 aprobadas |
 | Colaboración | Trabajo individual confirmado por el estudiante; asistencia de Codex declarada |
 
 ## Carga real del modelo
