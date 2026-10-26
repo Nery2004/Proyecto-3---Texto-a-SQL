@@ -1,0 +1,40 @@
+{
+  "baseline/callback": {
+    "ex": 0.625,
+    "ex_por_esquema": {
+      "hoteleria": 0.5208333333333334,
+      "manufactura": 0.7291666666666666
+    },
+    "errores_por_categoria": {
+      "columna_inexistente": 5,
+      "resultado_diferente": 6,
+      "error_ejecucion": 1,
+      "agregacion_incorrecta": 3,
+      "filtro_incorrecto": 1
+    },
+    "errores_por_dificultad": {
+      "dificil": 9,
+      "facil": 5,
+      "media": 2
+    }
+  },
+  "baseline/directa": {
+    "ex": 0.625,
+    "ex_por_esquema": {
+      "hoteleria": 0.5208333333333334,
+      "manufactura": 0.7291666666666666
+    },
+    "errores_por_categoria": {
+      "columna_inexistente": 5,
+      "resultado_diferente": 6,
+      "error_ejecucion": 1,
+      "agregacion_incorrecta": 3,
+      "filtro_incorrecto": 1
+    },
+    "errores_por_dificultad": {
+      "dificil": 9,
+      "facil": 5,
+      "media": 2
+    }
+  }
+}

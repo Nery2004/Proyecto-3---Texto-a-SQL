@@ -77,6 +77,13 @@ def test_dataset_order_flag_is_respected():
 def test_structural_categories_are_hypotheses(gold, sql, category):
     assert error_category("", gold, sql) == category
 
+def test_mysql_nested_aggregate_error():
+    assert error_category('1111 (HY000): Invalid use of group function') == 'agregacion_incorrecta'
+
+def test_window_frame_difference_is_aggregate_hypothesis():
+    assert error_category('', 'SELECT SUM(x) OVER (ORDER BY id ROWS UNBOUNDED PRECEDING) FROM t',
+                          'SELECT SUM(x) OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) FROM t') == 'agregacion_incorrecta'
+
 
 def test_callback_preview_does_not_truncate_scoring():
     rows = [(i,) for i in range(15)]

@@ -1,0 +1,10 @@
+{
+  "baseline": {
+    "ex_directa": 0.625,
+    "ex_callback": 0.625,
+    "media_directa_segundos": 1.4300582375002098,
+    "media_callback_segundos": 3.404018531250889,
+    "estrategia_recomendada": "directa",
+    "criterio": "Mayor EX; con empate, menor latencia observada. Las diferencias peque\u00f1as de tiempo pueden ser ruido."
+  }
+}

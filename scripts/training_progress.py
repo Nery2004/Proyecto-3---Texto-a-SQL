@@ -19,6 +19,15 @@ def update_progress(log, output):
         except (ValueError, SyntaxError):
             pass
     path = Path(output)
+    # Redirected Python stdout can stay buffered for many minutes on Windows.
+    # Trainer checkpoints preserve actual log_history independently of stdout.
+    for checkpoint in (path.parent / 'checkpoints').glob('checkpoint-*/trainer_state.json'):
+        try:
+            history = json.loads(checkpoint.read_text(encoding='utf-8'))['log_history']
+            losses.extend(item for item in history if 'loss' in item)
+        except (OSError, ValueError, KeyError):
+            pass  # A checkpoint may still be in the middle of a save.
+    losses.sort(key=lambda item: item.get('epoch', 0))
     report = {'estado': 'en_curso', 'fuente_log': str(log), 'actualizado_utc': datetime.now(timezone.utc).isoformat(),
               'paso_observado': int(steps[-1][0]) if steps else 0,
               'pasos_totales': int(steps[-1][1]) if steps else None,
@@ -26,7 +35,7 @@ def update_progress(log, output):
               'tiempo_transcurrido_entrenador': steps[-1][2] if steps else None,
               'tiempo_restante_estimado_entrenador': steps[-1][3] if steps else None,
               'ultimo_loss_observado': losses[-1] if losses else None,
-              'nota': 'TQDM y loss reales del log; las estimaciones de tiempo pueden cambiar. Loss null indica stdout aun sin registro visible.'}
+              'nota': 'TQDM y loss reales del log/checkpoint Trainer. Las estimaciones de tiempo pueden cambiar. Loss null indica que aun no hay registro visible; epoch/step del loss identifica su antiguedad.'}
     final = path.parent / 'run.json'
     if final.exists():
         report['estado'] = json.loads(final.read_text(encoding='utf-8'))['estado']

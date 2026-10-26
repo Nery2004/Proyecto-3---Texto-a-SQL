@@ -17,7 +17,7 @@ def structural_differences(reference_sql, generated_sql):
     except sqlglot.errors.ParseError:
         return []
     groups = {"join_incorrecto": (exp.Join,),
-              "agregacion_incorrecta": (exp.AggFunc, exp.Group, exp.Having),
+              "agregacion_incorrecta": (exp.AggFunc, exp.Group, exp.Having, exp.Window),
               "filtro_incorrecto": (exp.Where,)}
     differences = []
     for category, classes in groups.items():
@@ -33,7 +33,7 @@ def error_category(error, reference_sql="", generated_sql=""):
     for needles, category in [(("1064", "syntax"), "sintaxis"),
                               (("1146", "doesn't exist", "unknown table"), "tabla_inexistente"),
                               (("1054", "unknown column"), "columna_inexistente"),
-                              (("1055", "group by", "aggregate"), "agregacion_incorrecta")]:
+                              (("1055", "1111", "group by", "aggregate", "group function"), "agregacion_incorrecta")]:
         if any(word in text for word in needles):
             return category
     if error:

@@ -12,6 +12,11 @@ académica previa ni participación humana sin evidencia.
 6. Arranque del motor Docker y de MySQL 8.4.10; ejecución inicial de 2262 pares de entrenamiento y 463 propuestas independientes, sin descartes. Evidencia: 66950ff y JSONL con fechas de ejecución.
 7. Preparación de hipótesis previas, dos configuraciones QLoRA con rank como único factor y tres notebooks Colab. Evidencia: fd9cf77, docs/hipotesis_experimentos.md.
 8. Instalación aislada de PyTorch CUDA y auditoría de configuraciones, caché, modo base/adapter y seguridad. Evidencia: requirements.txt, tests/test_config.py; los experimentos reales se registran separadamente en resultados/metricas/.
+9. Auditoría de preguntas, Unicode, columnas y fixtures; se archivó la corrida preliminar invalidada y se fijó el snapshot definitivo antes de entrenar. Evidencia: fe2bb24, resultados/archivo_v1/ESTADO.md.
+10. Baseline real sobre 48 preguntas: EX directa 0.625 y callback 0.625; tiempos y consultas conservados antes de entrenar. Evidencia: resultados/baseline_pre_entrenamiento/.
+11. Inicio real de QLoRA A rank8, tres épocas, en RTX4060. Solo se consideran finales los artefactos con run.json completado. Evidencia: adapters_experimentos/config_a/progreso.json y supervisor de experimentos.
+12. Arranque de MySQL 8.4.10 desde binario oficial comprobado en Linux limpio, separado de la verificación T4 pendiente. Evidencia: resultados/metricas/colab_mysql_bootstrap_linux.json.
+13. Auditoría semántica automática: 1435 preguntas verificadas, 1483 fuera de cobertura y 12 controles negativos detectados. Evidencia: resultados/metricas/semantic_oracle.json. Autoría humana sigue pendiente.
 
 El historial `historial_git.txt` es un snapshot generado con
 `git log --all --date=iso --stat`. Por construcción no incluye su propio commit
