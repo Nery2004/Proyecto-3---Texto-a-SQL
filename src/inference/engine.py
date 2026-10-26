@@ -90,7 +90,9 @@ def infer(esquema, pregunta, ejecutar=None):
                 if last_safe:
                     return last_safe
                 raise
-            if ejecutar is None or time.monotonic() >= deadline:
+            # Reservar los 5s del ejecutor MySQL propio; callbacks externos deben
+            # garantizar su propio timeout dentro del presupuesto restante.
+            if ejecutar is None or deadline - time.monotonic() < 5.0:
                 return candidate
             result = ejecutar(candidate)
             if time.monotonic() >= deadline:

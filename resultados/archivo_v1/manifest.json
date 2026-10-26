@@ -1,0 +1,7 @@
+{
+  "estado": "invalidado",
+  "dataset_sha256": "bd48615bcb09312e693750bbf618c54c7d96a712dd29735bb4c5b75fad7a1812",
+  "directa": "completado real; consultar baseline_resumen.json",
+  "callback": "interrumpido tras detectar problemas generales de encoding/columnas en dataset; sin metricas completas",
+  "razon": "Preguntas con caracteres ? en lugar de acentos y columnas gold no solicitadas explicitamente"
+}

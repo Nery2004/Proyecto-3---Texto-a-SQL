@@ -43,7 +43,7 @@ class MySQLExecutor:
     def __enter__(self): return self
     def __exit__(self,*args): self.close()
 
-def initialize():
+def initialize(reset_owned=False):
     """Administrative fixture setup is separate from candidate SELECT execution."""
     import mysql.connector
     from .generate import DOMAINS,schema_sql,fixtures
@@ -59,6 +59,9 @@ def initialize():
         cursor.execute('REVOKE ALL PRIVILEGES, GRANT OPTION FROM %s@%s',(user,'%'))
         for schema_id in DOMAINS:
             database='textsql_'+schema_id
+            if reset_owned:
+                # Exact allowlist of this project's fixtures; never enumerate server databases.
+                cursor.execute(f'DROP DATABASE IF EXISTS `{database}`')
             cursor.execute(f'CREATE DATABASE IF NOT EXISTS `{database}`')
             cursor.execute(f'USE `{database}`')
             cursor.execute('SHOW TABLES')

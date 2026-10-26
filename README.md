@@ -100,8 +100,9 @@ Las métricas no medidas se indican como pendientes, nunca como cero observado.
 
 Implementación y propuestas de datos creadas con asistencia de OpenAI Codex,
 incluyendo agentes con funciones de datos, entrenamiento y evaluación. No se
-presentan como trabajo independiente de dos integrantes. Los responsables
-humanos deben completar sus aportes reales y la coevaluación en Canvas.
+presentan como trabajo independiente de dos integrantes. El usuario confirmó
+que trabaja individualmente. Debe registrar únicamente sus aportes humanos
+reales; no existe un segundo integrante al que atribuir contribuciones.
 
 Qwen se usa bajo su licencia publicada en la
 [ficha oficial](https://huggingface.co/Qwen/Qwen2.5-Coder-1.5B-Instruct).

@@ -8,8 +8,11 @@
 | EX, comparación y errores | Codex, agente de evaluación | src/evaluation/, tests/test_evaluation.py |
 | Pruebas, repositorio privado y documentación | Codex, asistencia IA | tests/, docs/github_access.json, historial_git.txt |
 | Autoría humana de validación | Pendiente identificar aportes reales | datos/validacion/revision_humana.csv |
-| Participación de ambos integrantes | No acreditada | No inventar autores ni commits retrospectivos |
+| Participación humana | Usuario: trabajo individual confirmado en conversación | No hay segundo integrante; no inventar autores ni commits |
 
 Los commits se realizaron con la identidad ya configurada en Git. Esto no
 acredita que esa persona haya redactado manualmente el código generado por IA.
-Los integrantes deben registrar nombres y evidencia de sus contribuciones reales.
+El usuario confirmó que trabaja solo y desconoce el usuario GitHub del docente.
+Registrar únicamente sus contribuciones reales. La modalidad individual difiere
+de la modalidad en parejas de la rúbrica; no se puede acreditar colaboración de
+dos personas. El acceso docente queda pendiente de identificar su cuenta.

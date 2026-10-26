@@ -30,11 +30,49 @@ def test_validation_human_authorship_not_fabricated():
     assert len({r['schema_id'] for r in rows})==2
     assert all(r['revision_humana']=='pendiente' for r in rows)
 
+def test_question_encoding_and_window_output_contract():
+    rows=[r for key in DOMAINS for r in candidates(key)]
+    assert all(not re.search(r'\w\?\w', r['pregunta']) for r in rows)
+    assert all(not r['pregunta'].startswith('?') for r in rows)
+    for row in rows:
+        if row['tipo_consulta']=='ventana':
+            assert row['requiere_orden'] is False
+            assert 'exactamente' in row['pregunta']
+        if row['tipo_consulta']=='having_subconsulta':
+            assert row['pregunta'].startswith('Devuelve exactamente')
+
 def test_fixtures_and_foreign_keys():
     for key,tables in DOMAINS.items():
         assert schema_sql(key).count('CREATE TABLE')==len(tables)
         assert fixtures(key).count('INSERT INTO')==len(tables)*12
         assert 'FOREIGN KEY' in schema_sql(key)
+
+def test_fixtures_cover_many_to_one_orphans_and_repeated_groups():
+    from collections import Counter
+    references=Counter((i*5)%8+1 for i in range(1,13))
+    assert max(references.values()) > 1
+    assert set(references) < set(range(1,13))
+    for key in DOMAINS:
+        seed=fixtures(key)
+        assert 'grupo 1' in seed and 'grupo 4' in seed
+        if any('DATE' in definition for _,definition in DOMAINS[key]):
+            assert "'2024-" in seed and "'2025-" in seed
+
+def test_numeric_fixtures_have_ties_and_distinct_column_values():
+    import ast
+    from collections import Counter
+    from itertools import combinations
+    from src.data.generate import columns
+    for key,tables in DOMAINS.items():
+        seed=fixtures(key).splitlines()
+        for table,definition in tables:
+            rows=[ast.literal_eval(line.split(' VALUES ',1)[1].rstrip(';')) for line in seed if line.startswith(f'INSERT INTO {table} ')]
+            numeric=[idx+1 for idx,(name,typ) in enumerate(columns(definition)) if typ not in ('TEXT','DATE') and not name.endswith('_id')]
+            for idx in numeric:
+                assert max(Counter(row[idx] for row in rows).values()) > 1
+                assert len({row[idx] for row in rows}) > 1
+            for left,right in combinations(numeric,2):
+                assert any(row[left]!=row[right] for row in rows)
 
 def test_accepted_examples_have_real_mysql_evidence():
     rows=read('datos/entrenamiento/aceptados.jsonl')

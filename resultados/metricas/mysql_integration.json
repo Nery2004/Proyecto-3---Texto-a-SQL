@@ -5,42 +5,42 @@
       "prueba": "join",
       "ok": true,
       "filas": 12,
-      "segundos": 0.03742999999667518,
+      "segundos": 0.00737390000722371,
       "error": null
     },
     {
       "prueba": "group_having",
       "ok": true,
-      "filas": 12,
-      "segundos": 0.0043227999994996935,
+      "filas": 8,
+      "segundos": 0.0029151000053389,
       "error": null
     },
     {
       "prueba": "subconsulta",
       "ok": true,
-      "filas": 6,
-      "segundos": 0.004013099998701364,
+      "filas": 4,
+      "segundos": 0.0029397000034805387,
       "error": null
     },
     {
       "prueba": "cte",
       "ok": true,
       "filas": 1,
-      "segundos": 0.004414499999256805,
+      "segundos": 0.0027685999957611784,
       "error": null
     },
     {
       "prueba": "ventana",
       "ok": true,
       "filas": 12,
-      "segundos": 0.00425369999720715,
+      "segundos": 0.0029150999907869846,
       "error": null
     },
     {
       "prueba": "fecha",
       "ok": true,
-      "filas": 1,
-      "segundos": 0.0037921000039204955,
+      "filas": 2,
+      "segundos": 0.0028710999904433265,
       "error": null
     },
     {

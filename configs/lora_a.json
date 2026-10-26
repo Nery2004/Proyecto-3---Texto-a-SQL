@@ -20,5 +20,17 @@
   "gradient_accumulation": 16,
   "learning_rate": 0.0002,
   "max_length": 2048,
-  "output_dir": "adapters_experimentos/config_a"
+  "output_dir": "adapters_experimentos/config_a",
+  "optimizer": "adamw_torch",
+  "scheduler": "cosine",
+  "warmup_ratio": 0.03,
+  "weight_decay": 0.01,
+  "quantization": {
+    "bits": 4,
+    "type": "nf4",
+    "double_quant": true,
+    "compute_dtype": "float16"
+  },
+  "gradient_checkpointing": true,
+  "fp16": true
 }

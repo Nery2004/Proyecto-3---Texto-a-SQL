@@ -1,6 +1,7 @@
 """Reproducible original schemas, fixtures and question/SQL candidates."""
 from pathlib import Path
 import json
+import sqlglot
 from itertools import combinations
 
 # Each domain deliberately has its own relationship graph and domain vocabulary.
@@ -42,11 +43,11 @@ def fixtures(schema_id):
         cols=columns(definition)
         for i in range(1,13):
             vals=[str(i)]
-            for name,typ in cols:
-                if name.endswith('_id'): val=str((i*5)%12+1)
-                elif typ=='TEXT': val=f"'{table} {i}'"
-                elif typ=='DATE': val=f"'2025-{(i%12)+1:02d}-{(i%27)+1:02d}'"
-                else: val=str((i*17)%97+1)
+            for column_index,(name,typ) in enumerate(cols):
+                if name.endswith('_id'): val=str((i*5+column_index*3)%8+1)
+                elif typ=='TEXT': val=f"'{table} grupo {(i%4)+1}'"
+                elif typ=='DATE': val=f"'{2024+(i%2)}-{(i%12)+1:02d}-{(i%27)+1:02d}'"
+                else: val=str(((i%6)*(17+column_index*3)+column_index*11)%97+1)
                 vals.append(val)
             statements.append(f"INSERT INTO {table} VALUES ("+', '.join(vals)+');')
     return '\n'.join(statements)
@@ -55,7 +56,8 @@ def candidates(schema_id):
     ddl=schema_sql(schema_id)
     rows=[]
     def add(question,sql,difficulty,kind):
-        rows.append(dict(id=f'{schema_id}-{len(rows)+1:05d}',schema_id=schema_id,esquema=ddl,pregunta=question,sql=sql,dificultad=difficulty,tipo_consulta=kind,origen='Codex: plantilla semántica original v1',validado=False,revision_humana='pendiente',requiere_orden=('ORDER BY' in sql)))
+        ordered = sqlglot.parse_one(sql, read='mysql').args.get('order') is not None
+        rows.append(dict(id=f'{schema_id}-{len(rows)+1:05d}',schema_id=schema_id,esquema=ddl,pregunta=question,sql=sql,dificultad=difficulty,tipo_consulta=kind,origen='Codex: plantilla semántica original v2; columnas explícitas',validado=False,revision_humana='pendiente',requiere_orden=ordered))
     for table,definition in DOMAINS[schema_id]:
         cols=columns(definition)
         numeric=[n for n,t in cols if t!='TEXT' and t!='DATE' and not n.endswith('_id')]
@@ -67,40 +69,40 @@ def candidates(schema_id):
                 add(f'¿Cuál es el {word} de {n} en {table}?',f'SELECT {fn}({n}) AS valor FROM {table}','media','agregacion')
                 add(f'¿Cuál es el {word} de {n} entre los registros de {table} cuyo id es par?',f'SELECT {fn}({n}) AS valor FROM {table} WHERE MOD(id, 2) = 0','media','agregacion')
             for threshold in [20,50,80]:
-                for fn,word in [('COUNT','cantidad'),('SUM','suma'),('AVG','promedio'),('MAX','m?ximo')]:
+                for fn,word in [('COUNT','cantidad'),('SUM','suma'),('AVG','promedio'),('MAX','máximo')]:
                     expr='*' if fn=='COUNT' else n
                     add(f'Calcula {word} de '+('registros' if fn=='COUNT' else n)+f' entre los registros de {table} donde {n} supera {threshold}.',f'SELECT {fn}({expr}) AS valor FROM {table} WHERE {n} > {threshold}','media','agregacion_filtrada')
             add(f'Muestra id y {n} de {table} por encima de su promedio.',f'SELECT id, {n} FROM {table} WHERE {n} > (SELECT AVG({n}) FROM {table})','dificil','subconsulta')
-            add(f'Clasifica los registros de {table} por {n} descendente asignando rango a los empates.',f'SELECT id, {n}, DENSE_RANK() OVER (ORDER BY {n} DESC) AS rango FROM {table}','dificil','ventana')
-            add(f'Calcula la suma acumulada de {n} en {table}, siguiendo el orden de id.',f'SELECT id, SUM({n}) OVER (ORDER BY id ROWS UNBOUNDED PRECEDING) AS acumulado FROM {table}','dificil','ventana')
+            add(f'Muestra exactamente id, {n} y un rango global de {table} calculado por {n} descendente: los empates comparten rango y no se dejan saltos entre rangos. No dividas los registros en grupos.',f'SELECT id, {n}, DENSE_RANK() OVER (ORDER BY {n} DESC) AS rango FROM {table}','dificil','ventana')
+            add(f'Muestra exactamente id y la suma acumulada de {n} en {table}, calculada siguiendo el orden ascendente de id e incluyendo el registro actual.',f'SELECT id, SUM({n}) OVER (ORDER BY id ROWS UNBOUNDED PRECEDING) AS acumulado FROM {table}','dificil','ventana')
             add(f'Usando una CTE, lista id de {table} cuyo {n} supera su promedio.',f'WITH promedio AS (SELECT AVG({n}) AS valor FROM {table}) SELECT t.id FROM {table} t CROSS JOIN promedio p WHERE t.{n} > p.valor','dificil','cte')
         for n in numeric:
             for group,typ in cols:
                 if group==n: continue
-                for fn,word in [('AVG','promedio'),('SUM','suma'),('MAX','m?ximo'),('MIN','m?nimo')]:
-                    add(f'Calcula el {word} de {n} para cada valor distinto de {group} en {table}.',f'SELECT {group}, {fn}({n}) AS valor FROM {table} GROUP BY {group}','media','agregacion_por_atributo')
-                    add(f'?Qu? valores de {group} en {table} tienen un {word} de {n} superior al promedio global de {n}?',f'SELECT {group}, {fn}({n}) AS valor FROM {table} GROUP BY {group} HAVING {fn}({n}) > (SELECT AVG({n}) FROM {table})','dificil','having_subconsulta')
-                add(f'Calcula cu?ntos valores distintos de {n} existen para cada {group} en {table}.',f'SELECT {group}, COUNT(DISTINCT {n}) AS distintos FROM {table} GROUP BY {group}','media','conteo_distinto')
-                add(f'Calcula el rango entre m?ximo y m?nimo de {n} para cada {group} en {table}.',f'SELECT {group}, MAX({n}) - MIN({n}) AS rango FROM {table} GROUP BY {group}','media','dispersion')
-                add(f'Calcula la desviaci?n est?ndar poblacional de {n} para cada {group} en {table}.',f'SELECT {group}, STDDEV_POP({n}) AS desviacion FROM {table} GROUP BY {group}','dificil','dispersion')
+                for fn,word in [('AVG','promedio'),('SUM','suma'),('MAX','máximo'),('MIN','mínimo')]:
+                    add(f'Devuelve exactamente {group} y el {word} de {n}, una fila por cada valor distinto de {group} en {table}.',f'SELECT {group}, {fn}({n}) AS valor FROM {table} GROUP BY {group}','media','agregacion_por_atributo')
+                    add(f'Devuelve exactamente {group} y el {word} de {n} para los grupos de {table} cuyo {word} de {n} supera el promedio global de {n} de toda la tabla.',f'SELECT {group}, {fn}({n}) AS valor FROM {table} GROUP BY {group} HAVING {fn}({n}) > (SELECT AVG({n}) FROM {table})','dificil','having_subconsulta')
+                add(f'Devuelve exactamente {group} y la cantidad de valores distintos de {n}, una fila por cada {group} en {table}.',f'SELECT {group}, COUNT(DISTINCT {n}) AS distintos FROM {table} GROUP BY {group}','media','conteo_distinto')
+                add(f'Devuelve exactamente {group} y la diferencia entre máximo y mínimo de {n}, una fila por cada {group} en {table}.',f'SELECT {group}, MAX({n}) - MIN({n}) AS rango FROM {table} GROUP BY {group}','media','dispersion')
+                add(f'Devuelve exactamente {group} y la desviación estándar poblacional de {n}, una fila por cada {group} en {table}.',f'SELECT {group}, STDDEV_POP({n}) AS desviacion FROM {table} GROUP BY {group}','dificil','dispersion')
         for a,b in combinations(numeric,2):
             for op,label in [('>','supera'),('<','es menor que')]:
                 add(f'Lista id, {a} y {b} de {table} donde {a} {label} {b}.',f'SELECT id, {a}, {b} FROM {table} WHERE {a} {op} {b}','media','comparacion')
         for fk,typ in cols:
             if fk.endswith('_id'):
                 parent=RELATIONS[fk[:-3]]
-                add(f'Cuenta los registros de {table} por {fk}, incluyendo solo grupos con más de un registro.',f'SELECT {fk}, COUNT(*) AS cantidad FROM {table} GROUP BY {fk} HAVING COUNT(*) > 1','media','having')
+                add(f'Devuelve exactamente {fk} y la cantidad de registros de {table} por {fk}, incluyendo solo grupos con más de un registro.',f'SELECT {fk}, COUNT(*) AS cantidad FROM {table} GROUP BY {fk} HAVING COUNT(*) > 1','media','having')
                 add(f'Muestra los id de {parent} sin registros relacionados en {table}.',f'SELECT p.id FROM {parent} p WHERE NOT EXISTS (SELECT 1 FROM {table} t WHERE t.{fk} = p.id)','dificil','subconsulta')
                 add(f'Lista los id de {table} junto con los id relacionados de {parent}.',f'SELECT t.id, p.id AS relacionado_id FROM {table} t JOIN {parent} p ON t.{fk} = p.id','media','join')
                 for n in numeric:
                     for fn,word in [('SUM','suma'),('AVG','promedio'),('MAX','máximo'),('MIN','mínimo')]:
-                        add(f'Obtén el {word} de {n} de {table} para cada {fk}.',f'SELECT {fk}, {fn}({n}) AS valor FROM {table} GROUP BY {fk}','media','group_by')
-                        add(f'Muestra el {word} de {n} de {table} por cada id de {parent}, incluyendo los que no tienen registros.',f'SELECT p.id, {fn}(t.{n}) AS valor FROM {parent} p LEFT JOIN {table} t ON t.{fk} = p.id GROUP BY p.id','dificil','join_agregacion')
-                    add(f'Asigna una posición por {n} descendente e id dentro de cada {fk} en {table}.',f'SELECT id, {fk}, ROW_NUMBER() OVER (PARTITION BY {fk} ORDER BY {n} DESC, id) AS posicion FROM {table}','dificil','ventana')
+                        add(f'Devuelve exactamente {fk} y el {word} de {n} de {table}, una fila por cada {fk}.',f'SELECT {fk}, {fn}({n}) AS valor FROM {table} GROUP BY {fk}','media','group_by')
+                        add(f'Devuelve exactamente el id de {parent} y el {word} de {n} de sus registros relacionados en {table}; incluye todos los id de {parent}, con agregado NULL si no tienen registros.',f'SELECT p.id, {fn}(t.{n}) AS valor FROM {parent} p LEFT JOIN {table} t ON t.{fk} = p.id GROUP BY p.id','dificil','join_agregacion')
+                    add(f'Devuelve exactamente id, {fk} y una posición consecutiva por registro dentro de cada {fk} en {table}, ordenando para calcularla por {n} descendente y, en empates, id ascendente.',f'SELECT id, {fk}, ROW_NUMBER() OVER (PARTITION BY {fk} ORDER BY {n} DESC, id) AS posicion FROM {table}','dificil','ventana')
             if typ=='DATE':
-                add(f'Cuenta los registros de {table} por año y mes de {fk}.',f'SELECT YEAR({fk}) AS anio, MONTH({fk}) AS mes, COUNT(*) AS cantidad FROM {table} GROUP BY YEAR({fk}), MONTH({fk})','media','fecha')
+                add(f'Devuelve exactamente año, mes y cantidad de registros de {table}, agrupados por año y mes de {fk}.',f'SELECT YEAR({fk}) AS anio, MONTH({fk}) AS mes, COUNT(*) AS cantidad FROM {table} GROUP BY YEAR({fk}), MONTH({fk})','media','fecha')
                 for month in range(1,13):
-                    add(f'Lista los registros de {table} de {month:02d}/2025.',f"SELECT * FROM {table} WHERE {fk} >= '2025-{month:02d}-01' AND {fk} < DATE_ADD('2025-{month:02d}-01', INTERVAL 1 MONTH)",'facil','fecha')
+                    add(f'Lista todas las columnas de los registros de {table} cuya {fk} corresponde a {month:02d}/2025, en el orden de columnas del esquema.',f"SELECT * FROM {table} WHERE {fk} >= '2025-{month:02d}-01' AND {fk} < DATE_ADD('2025-{month:02d}-01', INTERVAL 1 MONTH)",'facil','fecha')
     # Literal-only variants are not separate training examples.
     import re
     unique=[];seen=set()

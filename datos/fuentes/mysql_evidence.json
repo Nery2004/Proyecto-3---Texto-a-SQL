@@ -18,7 +18,134 @@
     "GRANT SELECT ON `textsql_universidad`.* TO `textsql_reader`@`%`"
   ],
   "datasets": {
-    "datos\\entrenamiento\\aceptados.jsonl": "159cd2c0050ee3ec8daabf51a1f64474e3e2a60edb89de2746ecde5857d734df",
-    "datos\\validacion\\aceptados.jsonl": "df7e367fe9c34bd96340a6399b8ee9185d8a8ef340996f94d799b81226cf3d06"
+    "datos\\entrenamiento\\aceptados.jsonl": "c730b3dc337089a81322dd5724493514ee8007b55ce5dfc591ff6e7eb4bc253e",
+    "datos\\validacion\\aceptados.jsonl": "2669e55cdc378fafcae5c903f3fe1933d362dca50f298b180ff9041fa521bd68"
+  },
+  "revision_plantillas": "v2: Unicode UTF-8, columnas expl?citas y orden exterior determinado con AST",
+  "fixtures_sha256": {
+    "datos\\esquemas\\banco\\seed.sql": "dae6b29c3bb28d945d9bb6967acbf2019f09b8f57c9235bab5d653ad39a976a0",
+    "datos\\esquemas\\biblioteca\\seed.sql": "3dbeace8ee1ae2979f221089705fd021d36e02ce9242270f0c77968059aa8cc7",
+    "datos\\esquemas\\hospital\\seed.sql": "4026cbbd3f08820aedae97d719352053be5edcdf2d8d6c8b8ec4524996c10933",
+    "datos\\esquemas\\hoteleria\\seed.sql": "e250e022653d535accd633dda482417a64462fc30b804e25b71ab7d0e4b937e3",
+    "datos\\esquemas\\inventarios\\seed.sql": "ae4588f2ec1f6552c00af6bf7114a20778f59a74db38843bcd4bd3e74130f3c7",
+    "datos\\esquemas\\manufactura\\seed.sql": "2dfad5fb50772ac28994ea73d15036b0312e93319116069fdbcce53968836127",
+    "datos\\esquemas\\reservaciones\\seed.sql": "7664efffa74e5bd4a852fe134ef3d436e2f9dbbf7f952fd74fe9f7074021cfbd",
+    "datos\\esquemas\\restaurante\\seed.sql": "833c621e3f6973f246d471e990811123b3e8b1037e427b56ce72ec110a42079f",
+    "datos\\esquemas\\rrhh\\seed.sql": "fc5856a1046e4d67bfba23c29b6fbaa9266dc4f5ca7e8b1e170c0cb4d598e2b7",
+    "datos\\esquemas\\tienda\\seed.sql": "7fd5276ca6d3f2abd6c2ca3b519328eef55e4914747dd57b6bed3c8ab90f5076",
+    "datos\\esquemas\\transporte\\seed.sql": "d1700fcba848d2985071bd218adc1bdb80936e03d4298c9f326ef732b24b4ce9",
+    "datos\\esquemas\\universidad\\seed.sql": "744b099dd36dc302a9ccb2a9d8486a71e8715f58a2b9f074915d229761803f82"
+  },
+  "revision_fixtures": "v3: many-to-one, orphan parents, repeated text/numeric groups, different numeric columns and two years",
+  "comprobaciones_semanticas_fixtures_mysql": {
+    "grupos_con_varios_alumnos": {
+      "sql": "SELECT facultad_id, COUNT(*) AS cantidad FROM alumnos GROUP BY facultad_id HAVING COUNT(*) > 1",
+      "filas": [
+        [
+          1,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          6,
+          2
+        ],
+        [
+          7,
+          2
+        ]
+      ]
+    },
+    "facultades_sin_alumnos": {
+      "sql": "SELECT f.id FROM facultades f WHERE NOT EXISTS (SELECT 1 FROM alumnos a WHERE a.facultad_id=f.id)",
+      "filas": [
+        [
+          9
+        ],
+        [
+          10
+        ],
+        [
+          11
+        ],
+        [
+          12
+        ]
+      ]
+    },
+    "nombres_repetidos": {
+      "sql": "SELECT nombre,COUNT(*) AS cantidad FROM alumnos GROUP BY nombre HAVING COUNT(*) > 1",
+      "filas": [
+        [
+          "alumnos grupo 2",
+          3
+        ],
+        [
+          "alumnos grupo 3",
+          3
+        ],
+        [
+          "alumnos grupo 4",
+          3
+        ],
+        [
+          "alumnos grupo 1",
+          3
+        ]
+      ]
+    },
+    "promedios_empatados": {
+      "sql": "SELECT promedio,COUNT(*) AS cantidad FROM alumnos GROUP BY promedio HAVING COUNT(*) > 1",
+      "filas": [
+        [
+          "46.00",
+          2
+        ],
+        [
+          "69.00",
+          2
+        ],
+        [
+          "92.00",
+          2
+        ],
+        [
+          "18.00",
+          2
+        ],
+        [
+          "41.00",
+          2
+        ],
+        [
+          "23.00",
+          2
+        ]
+      ]
+    },
+    "columnas_numericas_distintas": {
+      "sql": "SELECT COUNT(*) FROM alumnos WHERE edad != promedio",
+      "filas": [
+        [
+          12
+        ]
+      ]
+    },
+    "fechas_en_dos_anios": {
+      "sql": "SELECT YEAR(fecha), COUNT(*) FROM inscripciones GROUP BY YEAR(fecha)",
+      "filas": [
+        [
+          2025,
+          6
+        ],
+        [
+          2024,
+          6
+        ]
+      ]
+    }
   }
 }

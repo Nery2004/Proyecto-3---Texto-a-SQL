@@ -46,9 +46,10 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('action',choices=['generate','initialize','validate'])
     parser.add_argument('--root',type=Path,default=Path('.'))
+    parser.add_argument('--reset-owned',action='store_true',help='Rebuild only the 12 allowlisted textsql_<domain> fixture databases')
     args=parser.parse_args()
     if args.action=='generate': print(generate(args.root))
     elif args.action=='initialize':
         from src.data.mysql import initialize
-        initialize()
+        initialize(reset_owned=args.reset_owned)
     else: validate(args.root)

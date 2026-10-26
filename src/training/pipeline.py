@@ -71,10 +71,11 @@ def train(config_path):
         tokenizer.pad_token = tokenizer.eos_token
         tokenizer.padding_side = 'right'
         encoded = Dataset.from_list([encode_example(r, tokenizer, cfg['max_length']) for r in records])
-        quant = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type='nf4', bnb_4bit_use_double_quant=True, bnb_4bit_compute_dtype=torch.float16)
+        q = cfg['quantization']
+        quant = BitsAndBytesConfig(load_in_4bit=q['bits'] == 4, bnb_4bit_quant_type=q['type'], bnb_4bit_use_double_quant=q['double_quant'], bnb_4bit_compute_dtype=getattr(torch, q['compute_dtype']))
         model = AutoModelForCausalLM.from_pretrained(cfg['model'], revision=cfg['revision'], device_map={'': 0}, torch_dtype=torch.float16, quantization_config=quant, attn_implementation='eager')
         model.config.use_cache = False
-        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=cfg['gradient_checkpointing'])
         model = get_peft_model(model, LoraConfig(r=cfg['rank'], lora_alpha=cfg['alpha'], lora_dropout=cfg['dropout'], target_modules=cfg['target_modules'], bias='none', task_type='CAUSAL_LM'))
         trainable, total = model.get_nb_trainable_parameters()
         manifest.update(parametros_entrenables=trainable, parametros_totales=total, porcentaje_entrenable=100 * trainable / total, revision_resuelta=getattr(model.config, '_commit_hash', None))
@@ -83,7 +84,7 @@ def train(config_path):
             length = max(len(x['input_ids']) for x in batch)
             return {key: torch.tensor([x[key] + [(-100 if key == 'labels' else tokenizer.pad_token_id if key == 'input_ids' else 0)] * (length - len(x[key])) for x in batch]) for key in ('input_ids', 'attention_mask', 'labels')}
 
-        args = TrainingArguments(output_dir=str(output / 'checkpoints'), num_train_epochs=cfg['epochs'], per_device_train_batch_size=cfg['batch_size'], gradient_accumulation_steps=cfg['gradient_accumulation'], learning_rate=cfg['learning_rate'], lr_scheduler_type='cosine', warmup_ratio=0.03, optim='adamw_torch', weight_decay=0.01, fp16=True, gradient_checkpointing=True, logging_steps=5, save_strategy='epoch', save_total_limit=1, seed=cfg['seed'], data_seed=cfg['seed'], report_to='none', dataloader_num_workers=0, remove_unused_columns=False)
+        args = TrainingArguments(output_dir=str(output / 'checkpoints'), num_train_epochs=cfg['epochs'], per_device_train_batch_size=cfg['batch_size'], gradient_accumulation_steps=cfg['gradient_accumulation'], learning_rate=cfg['learning_rate'], lr_scheduler_type=cfg['scheduler'], warmup_ratio=cfg['warmup_ratio'], optim=cfg['optimizer'], weight_decay=cfg['weight_decay'], fp16=cfg['fp16'], gradient_checkpointing=cfg['gradient_checkpointing'], logging_steps=5, save_strategy='epoch', save_total_limit=1, seed=cfg['seed'], data_seed=cfg['seed'], report_to='none', dataloader_num_workers=0, remove_unused_columns=False)
         trainer = Trainer(model=model, args=args, train_dataset=encoded, data_collator=collate)
         torch.cuda.reset_peak_memory_stats()
         result = trainer.train()

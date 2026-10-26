@@ -21,6 +21,9 @@ def validate_sql(sql: str) -> str:
     tree = trees[0]
     forbidden = {"Insert", "Update", "Delete", "Drop", "Alter", "Create", "Command", "Into", "Lock", "Transaction", "Set", "Merge", "Grant", "Revoke", "Copy", "Use", "Placeholder", "Parameter"}
     dangerous = {"SLEEP", "BENCHMARK", "LOAD_FILE", "GET_LOCK", "RELEASE_LOCK", "RELEASE_ALL_LOCKS", "IS_FREE_LOCK", "IS_USED_LOCK", "SYS_EXEC", "SYS_EVAL", "MASTER_POS_WAIT", "SOURCE_POS_WAIT"}
+    # Una UDF puede tener efectos externos incluso con privilegios SELECT.
+    # Las funciones integradas que SQLGlot reconoce tienen nodos específicos.
+    anonymous_allowed = {"FIELD", "ELT", "FIND_IN_SET", "DATE_FORMAT", "STR_TO_DATE", "TIMESTAMPDIFF", "TIMESTAMPADD", "DAYNAME", "MONTHNAME", "WEEKDAY", "WEEKOFYEAR", "YEARWEEK", "CONVERT_TZ", "TIME_FORMAT", "FORMAT", "IFNULL", "NULLIF", "ROUND", "TRUNCATE", "LOG", "LOG10", "POW", "POWER", "STDDEV", "STDDEV_POP", "STDDEV_SAMP", "VAR_POP", "VAR_SAMP", "VARIANCE", "GROUP_CONCAT", "JSON_EXTRACT", "JSON_UNQUOTE", "JSON_ARRAYAGG", "JSON_OBJECTAGG", "GREATEST", "LEAST", "MOD"}
     for node in tree.walk():
         if type(node).__name__ in forbidden:
             raise UnsafeSQL(f"Operación no permitida: {type(node).__name__}")
@@ -28,6 +31,8 @@ def validate_sql(sql: str) -> str:
             name = node.name if isinstance(node, exp.Anonymous) else node.sql_name()
             if name.upper() in dangerous or isinstance(node.parent, exp.Dot):
                 raise UnsafeSQL(f"Función no permitida: {name}")
+            if isinstance(node, exp.Anonymous) and name.upper() not in anonymous_allowed | {"DENSE_RANK", "RANK", "ROW_NUMBER", "PERCENT_RANK", "CUME_DIST", "NTILE", "LAG", "LEAD", "FIRST_VALUE", "LAST_VALUE", "NTH_VALUE"}:
+                raise UnsafeSQL(f"Función desconocida/UDF no permitida: {name}")
     return tree.sql(dialect="mysql")
 
 def clean_sql(text: str) -> str:

@@ -6,7 +6,7 @@ from src.inference import engine
 from src.inference.safety import validate_sql, clean_sql, UnsafeSQL
 from src.inference.prompt import messages
 
-@pytest.mark.parametrize("sql", ["INSERT INTO a VALUES(1)", "UPDATE a SET x=1", "DELETE FROM a", "DROP TABLE a", "SELECT 1; SELECT 2", "SELECT * FROM a INTO OUTFILE '/tmp/a'", "SELECT SLEEP(3)", "SELECT (SELECT LOAD_FILE('/etc/passwd'))", "SELECT 1 /*! INTO OUTFILE '/tmp/a' */", "SELECT GET_LOCK('a',1)", "SELECT @x := 1"])
+@pytest.mark.parametrize("sql", ["INSERT INTO a VALUES(1)", "UPDATE a SET x=1", "DELETE FROM a", "DROP TABLE a", "SELECT 1; SELECT 2", "SELECT * FROM a INTO OUTFILE '/tmp/a'", "SELECT SLEEP(3)", "SELECT (SELECT LOAD_FILE('/etc/passwd'))", "SELECT 1 /*! INTO OUTFILE '/tmp/a' */", "SELECT GET_LOCK('a',1)", "SELECT @x := 1", "SELECT unknown_udf('payload')"])
 def test_unsafe(sql):
     with pytest.raises((UnsafeSQL, ValueError)):
         validate_sql(sql)

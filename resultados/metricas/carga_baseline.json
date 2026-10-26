@@ -1,4 +1,6 @@
 {
   "config": "configs/baseline.json",
-  "estado": "iniciado"
+  "estado": "completado",
+  "carga_modelo_segundos": 95.34399999999732,
+  "segundos_totales": 115.80309539999871
 }

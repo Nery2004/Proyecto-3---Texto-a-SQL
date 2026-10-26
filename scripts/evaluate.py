@@ -1,5 +1,6 @@
 """Run comparable real-model, real-MySQL evaluations; no synthetic scores."""
 import argparse
+import hashlib
 import importlib
 import json
 import os
@@ -36,6 +37,13 @@ def main():
     from src.inference.engine import get_runtime
     strategies = ["directa", "callback"] if args.strategy == "ambas" else [args.strategy]
     all_records, summaries = [], []
+    from src.inference.prompt import VERSION
+    manifest = {"dataset": args.dataset,
+                "dataset_sha256": hashlib.sha256(Path(args.dataset).read_bytes()).hexdigest(),
+                "prompt_version": VERSION, "configuraciones": configurations,
+                "nota_autoria": "Propuestas IA; revisar autoría humana antes de entrega académica"}
+    Path(args.output).mkdir(parents=True, exist_ok=True)
+    (Path(args.output) / "manifest_evaluacion.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     for config in args.config:
         os.environ["TEXT2SQL_CONFIG"] = str(Path(config).resolve())
         started = perf_counter()
