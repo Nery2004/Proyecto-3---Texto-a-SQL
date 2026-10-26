@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+.runtime/
+*.log
+checkpoints/
+*.safetensors
+!adapter/adapter_model.safetensors
+!adapters_experimentos/*/adapter_model.safetensors
