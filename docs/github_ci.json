@@ -1,0 +1,39 @@
+{
+  "runs": [
+    {
+      "head_sha": "842f946f72be33032db59d16fe5e02ba2705a43a",
+      "name": "CPU checks",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Nery2004/Proyecto-3---Texto-a-SQL/actions/runs/40249968710"
+    },
+    {
+      "head_sha": "883f0304e8f23e91e517f45225a8a25edd26519c",
+      "name": "CPU checks",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Nery2004/Proyecto-3---Texto-a-SQL/actions/runs/40249810354"
+    },
+    {
+      "head_sha": "b2a4b5d85bf5fe791d8667eb92ff03e1fcdff16c",
+      "name": "CPU checks",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Nery2004/Proyecto-3---Texto-a-SQL/actions/runs/40249310347"
+    },
+    {
+      "head_sha": "b3410c55f6b185337a8b37fcd87002d607be12ea",
+      "name": "CPU checks",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Nery2004/Proyecto-3---Texto-a-SQL/actions/runs/40249134479"
+    },
+    {
+      "head_sha": "189f2cb92460fc66821cea508640b3718cf28127",
+      "name": "CPU checks",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/Nery2004/Proyecto-3---Texto-a-SQL/actions/runs/40248773379"
+    }
+  ]
+}

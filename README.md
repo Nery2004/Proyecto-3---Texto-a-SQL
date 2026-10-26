@@ -55,6 +55,10 @@ semántica y las preguntas de validación escritas por estudiantes siguen pendie
 No usamos Spider/BIRD ni atribuimos esas propuestas a personas. Ver
 [datos y fuentes](docs/data.md), `datos/fuentes/estadisticas.json` y
 `datos/validacion/revision_humana.csv`.
+Una [auditoría automática independiente](docs/semantica.md) calculó en Python
+las respuestas de 1,435 preguntas a partir del texto y las filas de MySQL:
+cero discrepancias y doce controles negativos detectados. Otras 1,483 preguntas
+quedaron fuera de cobertura; esto no sustituye la revisión humana.
 
 ## Inferencia y entrenamiento
 
