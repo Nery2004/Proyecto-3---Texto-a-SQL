@@ -1,5 +1,8 @@
 # Python 3.10-3.12; T4: torch wheel CUDA 12.4 (Colab Linux).
 torch==2.6.0
+# Colab conserva estos paquetes preinstalados: alinear ABI con torch aunque el proyecto sea de texto.
+torchvision==0.21.0; sys_platform == 'linux'
+torchaudio==2.6.0; sys_platform == 'linux'
 transformers==4.48.3
 peft==0.14.0
 accelerate==1.3.0
