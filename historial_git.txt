@@ -1,0 +1,176 @@
+﻿commit cdc6f15e9e54766b56ef729addc6a42c87916ff9
+Author: ¨Nery2004¨ <josemolinatics@gmail.com>
+Date:   2026-10-25 17:09:39 -0700
+
+    docs: add measured MySQL checks and twelve-page delivery report
+
+ docs/dependencias.md                            |   2 +
+ docs/estado_ejecucion.md                        |  29 ++++++++++
+ presentacion.pdf                                | Bin 0 -> 11034 bytes
+ resultados/README.md                            |   5 ++
+ resultados/baseline.csv                         |   1 +
+ resultados/comparacion_lora.csv                 |   1 +
+ resultados/errores.csv                          |   1 +
+ resultados/metricas/carga_baseline.json         |   4 ++
+ resultados/metricas/dependencias_instaladas.txt | Bin 0 -> 2638 bytes
+ resultados/metricas/mysql_integration.json      |  59 ++++++++++++++++++++
+ resultados/metricas/pip_check.txt               | Bin 0 -> 64 bytes
+ resultados/metricas/pruebas.json                |   5 ++
+ resultados/metricas/pytest.xml                  |   1 +
+ resultados/validacion_propia.csv                |   1 +
+ scripts/audit_mysql.py                          |  39 ++++++++++++++
+ scripts/preload_model.py                        |   8 ++-
+ scripts/report.py                               |  69 ++++++++++++++++++++++++
+ src/evaluation/runner.py                        |   2 +-
+ src/inference/engine.py                         |   3 ++
+ src/training/pipeline.py                        |   2 +
+ tests/test_evaluation.py                        |   7 +++
+ 21 files changed, 236 insertions(+), 3 deletions(-)
+
+commit 6a972edcfc1e8d4ad21d3ddd49622f7933af4823
+Author: ¨Nery2004¨ <josemolinatics@gmail.com>
+Date:   2026-10-25 17:07:40 -0700
+
+    feat(data): remove literal-only duplicates and document verified provenance
+
+ BITACORA.md                                       |   18 +
+ CONTRIBUCIONES.md                                 |   15 +
+ README.md                                         |  111 +
+ datos/entrenamiento/aceptados.jsonl               | 4702 +++++++++++----------
+ datos/entrenamiento/candidatos.jsonl              | 4608 ++++++++++----------
+ datos/fuentes/estadisticas.json                   |   66 +-
+ datos/fuentes/mysql_evidence.json                 |    4 +-
+ datos/validacion/aceptados.jsonl                  |  941 +++--
+ datos/validacion/evaluacion_48.jsonl              |   48 +
+ datos/validacion/propuestas_revision_humana.jsonl |  935 ++--
+ datos/validacion/revision_humana.csv              |  935 ++--
+ docs/data.md                                      |    4 +-
+ notebooks/01_construccion_dataset.ipynb           |   24 +-
+ notebooks/02_entrenamiento_lora.ipynb             |   33 +-
+ notebooks/03_evaluacion_modelo.ipynb              |   33 +-
+ src/data/generate.py                              |   21 +-
+ tests/test_data.py                                |    6 +-
+ 17 files changed, 6577 insertions(+), 5927 deletions(-)
+
+commit fd9cf77a6b5818fd12cd9e0979bfe9b04b42df15
+Author: ¨Nery2004¨ <josemolinatics@gmail.com>
+Date:   2026-10-25 17:06:34 -0700
+
+    feat(training): prepare comparable QLoRA ranks and Colab notebooks
+
+ configs/baseline.json                   |   6 ++
+ configs/lora_a.json                     |  24 ++++++
+ configs/lora_b.json                     |  24 ++++++
+ docs/dependencias.md                    |  13 +++
+ docs/hipotesis_experimentos.md          |  16 ++++
+ notebooks/01_construccion_dataset.ipynb | 112 +++++++++++++++++++++++++
+ notebooks/02_entrenamiento_lora.ipynb   | 141 ++++++++++++++++++++++++++++++++
+ notebooks/03_evaluacion_modelo.ipynb    | 137 +++++++++++++++++++++++++++++++
+ requirements.txt                        |  19 +++++
+ scripts/diagnose.py                     |   7 ++
+ scripts/preload_model.py                |  32 ++++++++
+ scripts/select_validation.py            |  22 +++++
+ scripts/train.py                        |  12 +++
+ scripts/with_env.py                     |  19 +++++
+ src/training/__init__.py                |   1 +
+ src/training/pipeline.py                | 111 +++++++++++++++++++++++++
+ tests/test_training.py                  |  32 ++++++++
+ 17 files changed, 728 insertions(+)
+
+commit 66950ffca0a96c8788fb65d29ed5667489c62842
+Author: ¨Nery2004¨ <josemolinatics@gmail.com>
+Date:   2026-10-25 17:05:45 -0700
+
+    feat(data): validate 2725 original pairs against MySQL 8.4.10
+
+ compose.yaml                                      |   18 +
+ datos/descartes/descartes.jsonl                   |    0
+ datos/entrenamiento/aceptados.jsonl               | 2262 +++++++++++++++++++++
+ datos/entrenamiento/candidatos.jsonl              | 2262 +++++++++++++++++++++
+ datos/esquemas/banco/schema.sql                   |    4 +
+ datos/esquemas/banco/seed.sql                     |   48 +
+ datos/esquemas/biblioteca/schema.sql              |    4 +
+ datos/esquemas/biblioteca/seed.sql                |   48 +
+ datos/esquemas/hospital/schema.sql                |    5 +
+ datos/esquemas/hospital/seed.sql                  |   60 +
+ datos/esquemas/hoteleria/schema.sql               |    4 +
+ datos/esquemas/hoteleria/seed.sql                 |   48 +
+ datos/esquemas/inventarios/schema.sql             |    4 +
+ datos/esquemas/inventarios/seed.sql               |   48 +
+ datos/esquemas/manufactura/schema.sql             |    4 +
+ datos/esquemas/manufactura/seed.sql               |   48 +
+ datos/esquemas/reservaciones/schema.sql           |    3 +
+ datos/esquemas/reservaciones/seed.sql             |   36 +
+ datos/esquemas/restaurante/schema.sql             |    4 +
+ datos/esquemas/restaurante/seed.sql               |   48 +
+ datos/esquemas/rrhh/schema.sql                    |    5 +
+ datos/esquemas/rrhh/seed.sql                      |   60 +
+ datos/esquemas/tienda/schema.sql                  |    5 +
+ datos/esquemas/tienda/seed.sql                    |   60 +
+ datos/esquemas/transporte/schema.sql              |    4 +
+ datos/esquemas/transporte/seed.sql                |   48 +
+ datos/esquemas/universidad/schema.sql             |    4 +
+ datos/esquemas/universidad/seed.sql               |   48 +
+ datos/fuentes/README.md                           |    3 +
+ datos/fuentes/estadisticas.json                   |   68 +
+ datos/fuentes/mysql_evidence.json                 |   24 +
+ datos/validacion/aceptados.jsonl                  |  463 +++++
+ datos/validacion/propuestas_revision_humana.jsonl |  463 +++++
+ datos/validacion/revision_humana.csv              |  464 +++++
+ docs/data.md                                      |   16 +
+ scripts/build_dataset.py                          |   54 +
+ src/data/__init__.py                              |    1 +
+ src/data/generate.py                              |  116 ++
+ src/data/mysql.py                                 |   70 +
+ tests/test_data.py                                |   45 +
+ 40 files changed, 6979 insertions(+)
+
+commit 6b4897ef3841b882ec501bfae45dad5612f34ce4
+Author: ¨Nery2004¨ <josemolinatics@gmail.com>
+Date:   2026-10-25 17:05:21 -0700
+
+    feat(evaluation): compare executed results and audit inference limits
+
+ adapter/README.md          |   6 ++
+ docs/evaluacion.md         |  56 +++++++++++++++++
+ docs/limitaciones.md       |  21 +++++++
+ scripts/evaluate.py        |  80 ++++++++++++++++++++++++
+ src/evaluation/__init__.py |   5 ++
+ src/evaluation/metrics.py  |  56 +++++++++++++++++
+ src/evaluation/runner.py   | 149 +++++++++++++++++++++++++++++++++++++++++++++
+ src/inference/engine.py    |   8 ++-
+ tests/test_config.py       |  40 ++++++++++++
+ tests/test_evaluation.py   |  98 +++++++++++++++++++++++++++++
+ 10 files changed, 516 insertions(+), 3 deletions(-)
+
+commit 7482a7f4a3aacccf9115e567eee18b8f4f965319
+Author: ¨Nery2004¨ <josemolinatics@gmail.com>
+Date:   2026-10-25 17:04:12 -0700
+
+    chore: add CPU checks and verify private repository access
+
+ .github/workflows/tests.yml  | 12 ++++++++++++
+ docs/github_access.json      |  6 ++++++
+ scripts/diagnose.py          | 21 +++++++++++++++++++++
+ scripts/repository_access.py | 36 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 75 insertions(+)
+
+commit a31a0768fd23f543a411175ad057d5e936ba7c4f
+Author: ¨Nery2004¨ <josemolinatics@gmail.com>
+Date:   2026-10-25 17:03:03 -0700
+
+    feat(inference): implement deterministic SQL contract and AST safeguards
+
+ .gitignore                | 11 ++++++
+ ROADMAP.md                | 15 ++++++++
+ config.json               |  6 +++
+ pytest.ini                |  3 ++
+ solucion.py               |  5 +++
+ src/__init__.py           |  0
+ src/inference/__init__.py |  0
+ src/inference/config.py   | 23 +++++++++++
+ src/inference/engine.py   | 98 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/inference/prompt.py   | 14 +++++++
+ src/inference/safety.py   | 40 +++++++++++++++++++
+ tests/test_inference.py   | 39 +++++++++++++++++++
+ 12 files changed, 254 insertions(+)
