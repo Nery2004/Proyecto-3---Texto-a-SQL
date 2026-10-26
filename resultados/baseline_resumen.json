@@ -1,0 +1,10 @@
+{
+  "preguntas": 48,
+  "ex_ponderada": 0.625,
+  "latencia_promedio": 1.4300582375002098,
+  "latencia_maxima": 4.450314100002288,
+  "fuera_de_limite": 0,
+  "llamadas_ejecutar": 0,
+  "reparaciones_exitosas": 0,
+  "reparaciones_fallidas": 0
+}

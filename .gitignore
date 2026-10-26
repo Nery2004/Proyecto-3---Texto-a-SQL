@@ -6,6 +6,7 @@ __pycache__/
 .runtime/
 *.log
 checkpoints/
+entrega_proyecto3.zip
 *.safetensors
 !adapter/adapter_model.safetensors
 !adapters_experimentos/*/adapter_model.safetensors

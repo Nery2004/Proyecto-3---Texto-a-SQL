@@ -1,0 +1,361 @@
+{
+  "estado": "completado",
+  "tipo": "evidencia limitada entre estrategias",
+  "definicion": "Misma pregunta, mismo modelo y prompt inicial; primera generacion con ejecutar=None y segunda con callback que ejecuta una sola consulta sin errores, por lo que no hubo reparacion. No son dos llamadas identicas a la API. SQL final comparado literalmente.",
+  "pares": [
+    {
+      "id": "hoteleria-00030",
+      "pregunta": "Devuelve exactamente nombre y la desviación estándar poblacional de estrellas, una fila por cada nombre en hoteles.",
+      "sql_primero": "SELECT h.nombre, STDDEV(h.estrellas) AS desviacion_estandar FROM hoteles AS h GROUP BY h.nombre",
+      "sql_segundo": "SELECT h.nombre, STDDEV(h.estrellas) AS desviacion_estandar FROM hoteles AS h GROUP BY h.nombre",
+      "iguales": true,
+      "latencia_primero": 1.7746961999946507,
+      "latencia_segundo": 1.182916399993701
+    },
+    {
+      "id": "hoteleria-00202",
+      "pregunta": "Devuelve exactamente fecha y el suma de noches para los grupos de estancias cuyo suma de noches supera el promedio global de noches de toda la tabla.",
+      "sql_primero": "WITH PromedioNoches AS (SELECT AVG(noches) AS promedio_noches FROM estancias), GruposDeEstancias AS (SELECT e.huesped_id, SUM(e.noches) AS total_noches FROM estancias AS e GROUP BY e.huesped_id) SELECT gde.huesped_id, gde.total_noches, gde.total_noches - p.promedio_noches AS diferencia FROM GruposDeEstancias AS gde JOIN PromedioNoches AS p ON gde.total_noches > p.promedio_noches",
+      "sql_segundo": "WITH PromedioNoches AS (SELECT AVG(noches) AS promedio_noches FROM estancias), GruposDeEstancias AS (SELECT e.huesped_id, SUM(e.noches) AS total_noches FROM estancias AS e GROUP BY e.huesped_id) SELECT gde.huesped_id, gde.total_noches, gde.total_noches - p.promedio_noches AS diferencia FROM GruposDeEstancias AS gde JOIN PromedioNoches AS p ON gde.total_noches > p.promedio_noches",
+      "iguales": true,
+      "latencia_primero": 4.450314100002288,
+      "latencia_segundo": 4.468545700001414
+    },
+    {
+      "id": "hoteleria-00174",
+      "pregunta": "Muestra exactamente id, noches y un rango global de estancias calculado por noches descendente: los empates comparten rango y no se dejan saltos entre rangos. No dividas los registros en grupos.",
+      "sql_primero": "WITH Ranges AS (SELECT MIN(noches) OVER () AS min_noches, MAX(noches) OVER () AS max_noches FROM estancias) SELECT e.id, e.noches, CONCAT(min_noches, '-', max_noches) AS `range` FROM estancias AS e JOIN Ranges AS r ON e.noches BETWEEN r.min_noches AND r.max_noches",
+      "sql_segundo": "WITH Ranges AS (SELECT MIN(noches) OVER () AS min_noches, MAX(noches) OVER () AS max_noches FROM estancias) SELECT e.id, e.noches, CONCAT(min_noches, '-', max_noches) AS `range` FROM estancias AS e JOIN Ranges AS r ON e.noches BETWEEN r.min_noches AND r.max_noches",
+      "iguales": true,
+      "latencia_primero": 3.301570099996752,
+      "latencia_segundo": 3.389547099999618
+    },
+    {
+      "id": "hoteleria-00094",
+      "pregunta": "Devuelve exactamente hotel_id y el suma de tarifa para los grupos de habitaciones cuyo suma de tarifa supera el promedio global de tarifa de toda la tabla.",
+      "sql_primero": "WITH PromedioTarifa AS (SELECT AVG(tarifa) AS promedio FROM habitaciones), TotalTarifa AS (SELECT SUM(tarifa) AS total FROM habitaciones) SELECT h.id, t.total - p.promedio AS suma_tarifa FROM habitaciones AS h JOIN TotalTarifa AS t ON TRUE JOIN PromedioTarifa AS p ON TRUE WHERE t.total > p.promedio",
+      "sql_segundo": "WITH PromedioTarifa AS (SELECT AVG(tarifa) AS promedio FROM habitaciones), TotalTarifa AS (SELECT SUM(tarifa) AS total FROM habitaciones) SELECT h.id, t.total - p.promedio AS suma_tarifa FROM habitaciones AS h JOIN TotalTarifa AS t ON TRUE JOIN PromedioTarifa AS p ON TRUE WHERE t.total > p.promedio",
+      "iguales": true,
+      "latencia_primero": 3.0353166999993846,
+      "latencia_segundo": 3.00480609999795
+    },
+    {
+      "id": "hoteleria-00175",
+      "pregunta": "Muestra exactamente id y la suma acumulada de noches en estancias, calculada siguiendo el orden ascendente de id e incluyendo el registro actual.",
+      "sql_primero": "SELECT id, SUM(noches) OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) AS total_noches FROM estancias",
+      "sql_segundo": "SELECT id, SUM(noches) OVER (ORDER BY id ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) AS total_noches FROM estancias",
+      "iguales": true,
+      "latencia_primero": 1.4293267000030028,
+      "latencia_segundo": 1.404137700010324
+    },
+    {
+      "id": "hoteleria-00222",
+      "pregunta": "Devuelve exactamente el id de huespedes y el promedio de noches de sus registros relacionados en estancias; incluye todos los id de huespedes, con agregado NULL si no tienen registros.",
+      "sql_primero": "SELECT huespedes.id, AVG(estancias.noches) AS promedio_noches FROM huespedes LEFT JOIN estancias ON huespedes.id = estancias.huesped_id GROUP BY huespedes.id",
+      "sql_segundo": "SELECT huespedes.id, AVG(estancias.noches) AS promedio_noches FROM huespedes LEFT JOIN estancias ON huespedes.id = estancias.huesped_id GROUP BY huespedes.id",
+      "iguales": true,
+      "latencia_primero": 2.119352499998058,
+      "latencia_segundo": 2.122275300003821
+    },
+    {
+      "id": "hoteleria-00051",
+      "pregunta": "Lista id y tarifa de habitaciones con tarifa menor que 20, ordenados por tarifa y después id.",
+      "sql_primero": "SELECT id, tarifa FROM habitaciones WHERE tarifa < 20 ORDER BY tarifa ASC, id ASC",
+      "sql_segundo": "SELECT id, tarifa FROM habitaciones WHERE tarifa < 20 ORDER BY tarifa ASC, id ASC",
+      "iguales": true,
+      "latencia_primero": 0.9658204999868758,
+      "latencia_segundo": 0.9887750999914715
+    },
+    {
+      "id": "hoteleria-00227",
+      "pregunta": "Lista todas las columnas de los registros de estancias cuya fecha corresponde a 01/2025, en el orden de columnas del esquema.",
+      "sql_primero": "SELECT * FROM estancias WHERE fecha = '2025-01-01' ORDER BY id",
+      "sql_segundo": "SELECT * FROM estancias WHERE fecha = '2025-01-01' ORDER BY id",
+      "iguales": true,
+      "latencia_primero": 0.8301360000041313,
+      "latencia_segundo": 0.8483210999984294
+    },
+    {
+      "id": "hoteleria-00002",
+      "pregunta": "Lista id y estrellas de hoteles con estrellas menor que 20, ordenados por estrellas y después id.",
+      "sql_primero": "SELECT id, estrellas FROM hoteles WHERE estrellas < 20 ORDER BY estrellas ASC, id ASC",
+      "sql_segundo": "SELECT id, estrellas FROM hoteles WHERE estrellas < 20 ORDER BY estrellas ASC, id ASC",
+      "iguales": true,
+      "latencia_primero": 1.006518700000015,
+      "latencia_segundo": 1.0375537000072654
+    },
+    {
+      "id": "hoteleria-00003",
+      "pregunta": "Lista id y estrellas de hoteles con estrellas igual a 20, ordenados por estrellas y después id.",
+      "sql_primero": "SELECT id, estrellas FROM hoteles WHERE estrellas = 20 ORDER BY estrellas ASC, id ASC",
+      "sql_segundo": "SELECT id, estrellas FROM hoteles WHERE estrellas = 20 ORDER BY estrellas ASC, id ASC",
+      "iguales": true,
+      "latencia_primero": 1.024001000012504,
+      "latencia_segundo": 1.0406030000012834
+    },
+    {
+      "id": "hoteleria-00052",
+      "pregunta": "Lista id y tarifa de habitaciones con tarifa igual a 20, ordenados por tarifa y después id.",
+      "sql_primero": "SELECT id, tarifa FROM habitaciones WHERE tarifa = 20 ORDER BY tarifa ASC, id ASC",
+      "sql_segundo": "SELECT id, tarifa FROM habitaciones WHERE tarifa = 20 ORDER BY tarifa ASC, id ASC",
+      "iguales": true,
+      "latencia_primero": 1.0415917999926023,
+      "latencia_segundo": 0.9980330999969738
+    },
+    {
+      "id": "hoteleria-00159",
+      "pregunta": "Lista id y noches de estancias con noches menor que 20, ordenados por noches y después id.",
+      "sql_primero": "SELECT id, noches FROM estancias WHERE noches < 20 ORDER BY noches ASC, id DESC",
+      "sql_segundo": "SELECT id, noches FROM estancias WHERE noches < 20 ORDER BY noches ASC, id DESC",
+      "iguales": true,
+      "latencia_primero": 1.0893960999965202,
+      "latencia_segundo": 1.0392801999987569
+    },
+    {
+      "id": "hoteleria-00151",
+      "pregunta": "Devuelve exactamente nombre y el máximo de edad, una fila por cada valor distinto de nombre en huespedes.",
+      "sql_primero": "SELECT h.nombre, MAX(h.edad) FROM huespedes AS h GROUP BY h.nombre",
+      "sql_segundo": "SELECT h.nombre, MAX(h.edad) FROM huespedes AS h GROUP BY h.nombre",
+      "iguales": true,
+      "latencia_primero": 1.099107299989555,
+      "latencia_segundo": 1.1054263999976683
+    },
+    {
+      "id": "hoteleria-00138",
+      "pregunta": "¿Cuál es el mínimo de edad entre los registros de huespedes cuyo id es par?",
+      "sql_primero": "SELECT MIN(edad) FROM huespedes WHERE id % 2 = 0",
+      "sql_segundo": "SELECT MIN(edad) FROM huespedes WHERE id % 2 = 0",
+      "iguales": true,
+      "latencia_primero": 0.6418332000030205,
+      "latencia_segundo": 0.6281910999969114
+    },
+    {
+      "id": "hoteleria-00036",
+      "pregunta": "¿Cuál es el suma de numero en habitaciones?",
+      "sql_primero": "SELECT SUM(numero) FROM habitaciones",
+      "sql_segundo": "SELECT SUM(numero) FROM habitaciones",
+      "iguales": true,
+      "latencia_primero": 0.29057660000398755,
+      "latencia_segundo": 0.29385200000251643
+    },
+    {
+      "id": "hoteleria-00012",
+      "pregunta": "Calcula cantidad de registros entre los registros de hoteles donde estrellas supera 20.",
+      "sql_primero": "SELECT COUNT(*) FROM hoteles WHERE estrellas > 20",
+      "sql_segundo": "SELECT COUNT(*) FROM hoteles WHERE estrellas > 20",
+      "iguales": true,
+      "latencia_primero": 0.7648788000078639,
+      "latencia_segundo": 0.7125723000062862
+    },
+    {
+      "id": "hoteleria-00029",
+      "pregunta": "Devuelve exactamente nombre y la diferencia entre máximo y mínimo de estrellas, una fila por cada nombre en hoteles.",
+      "sql_primero": "SELECT h.nombre, MAX(h.estrellas) - MIN(h.estrellas) AS diferencia_estrellas FROM hoteles AS h GROUP BY h.nombre",
+      "sql_segundo": "SELECT h.nombre, MAX(h.estrellas) - MIN(h.estrellas) AS diferencia_estrellas FROM hoteles AS h GROUP BY h.nombre",
+      "iguales": true,
+      "latencia_primero": 1.2159168999933172,
+      "latencia_segundo": 1.2344812999945134
+    },
+    {
+      "id": "hoteleria-00024",
+      "pregunta": "Devuelve exactamente nombre y el máximo de estrellas, una fila por cada valor distinto de nombre en hoteles.",
+      "sql_primero": "SELECT h.nombre, MAX(h.estrellas) FROM hoteles AS h GROUP BY h.nombre",
+      "sql_segundo": "SELECT h.nombre, MAX(h.estrellas) FROM hoteles AS h GROUP BY h.nombre",
+      "iguales": true,
+      "latencia_primero": 0.8590002999990247,
+      "latencia_segundo": 0.8456432999955723
+    },
+    {
+      "id": "hoteleria-00183",
+      "pregunta": "Devuelve exactamente habitacion_id y el mínimo de noches, una fila por cada valor distinto de habitacion_id en estancias.",
+      "sql_primero": "SELECT habitacion_id, MIN(noches) FROM estancias GROUP BY habitacion_id",
+      "sql_segundo": "SELECT habitacion_id, MIN(noches) FROM estancias GROUP BY habitacion_id",
+      "iguales": true,
+      "latencia_primero": 0.8324751999898581,
+      "latencia_segundo": 0.8673091999953613
+    },
+    {
+      "id": "manufactura-00172",
+      "pregunta": "Devuelve exactamente unidades y la desviación estándar poblacional de defectos, una fila por cada unidades en lotes.",
+      "sql_primero": "SELECT l.unidades, STDDEV(l.defectos) FROM lotes AS l GROUP BY l.unidades",
+      "sql_segundo": "SELECT l.unidades, STDDEV(l.defectos) FROM lotes AS l GROUP BY l.unidades",
+      "iguales": true,
+      "latencia_primero": 1.1787303000019165,
+      "latencia_segundo": 1.17752979999932
+    },
+    {
+      "id": "manufactura-00055",
+      "pregunta": "Devuelve exactamente planta_id y el máximo de costo para los grupos de maquinas cuyo máximo de costo supera el promedio global de costo de toda la tabla.",
+      "sql_primero": "SELECT m.planta_id, MAX(m.costo) FROM maquinas AS m WHERE m.costo > (SELECT AVG(costo) FROM maquinas) GROUP BY m.planta_id",
+      "sql_segundo": "SELECT m.planta_id, MAX(m.costo) FROM maquinas AS m WHERE m.costo > (SELECT AVG(costo) FROM maquinas) GROUP BY m.planta_id",
+      "iguales": true,
+      "latencia_primero": 1.5963563999976031,
+      "latencia_segundo": 1.6224502999975812
+    },
+    {
+      "id": "manufactura-00119",
+      "pregunta": "Devuelve exactamente maquina_id y el promedio de unidades para los grupos de lotes cuyo promedio de unidades supera el promedio global de unidades de toda la tabla.",
+      "sql_primero": "WITH PromedioGlobal AS (SELECT AVG(unidades) AS promedio_global FROM lotes), PromedioPorGrupo AS (SELECT maquina_id, AVG(unidades) AS promedio_grupo FROM lotes GROUP BY maquina_id) SELECT maquina_id, promedio_grupo FROM PromedioPorGrupo WHERE promedio_grupo > (SELECT promedio_global FROM PromedioGlobal)",
+      "sql_segundo": "WITH PromedioGlobal AS (SELECT AVG(unidades) AS promedio_global FROM lotes), PromedioPorGrupo AS (SELECT maquina_id, AVG(unidades) AS promedio_grupo FROM lotes GROUP BY maquina_id) SELECT maquina_id, promedio_grupo FROM PromedioPorGrupo WHERE promedio_grupo > (SELECT promedio_global FROM PromedioGlobal)",
+      "iguales": true,
+      "latencia_primero": 3.086002500000177,
+      "latencia_segundo": 3.1079482000059215
+    },
+    {
+      "id": "manufactura-00249",
+      "pregunta": "Devuelve exactamente id, lote_id y una posición consecutiva por registro dentro de cada lote_id en inspecciones, ordenando para calcularla por puntaje descendente y, en empates, id ascendente.",
+      "sql_primero": "WITH RankedInspections AS (SELECT i.id, i.lote_id, ROW_NUMBER() OVER (PARTITION BY i.lote_id ORDER BY i.puntaje DESC, i.id ASC) AS rn FROM inspecciones AS i) SELECT r.id, r.lote_id, r.rn FROM RankedInspections AS r",
+      "sql_segundo": "WITH RankedInspections AS (SELECT i.id, i.lote_id, ROW_NUMBER() OVER (PARTITION BY i.lote_id ORDER BY i.puntaje DESC, i.id ASC) AS rn FROM inspecciones AS i) SELECT r.id, r.lote_id, r.rn FROM RankedInspections AS r",
+      "iguales": true,
+      "latencia_primero": 3.014548499995726,
+      "latencia_segundo": 3.058526599998004
+    },
+    {
+      "id": "manufactura-00073",
+      "pregunta": "Muestra los id de plantas sin registros relacionados en maquinas.",
+      "sql_primero": "SELECT id FROM plantas WHERE NOT id IN (SELECT DISTINCT planta_id FROM maquinas)",
+      "sql_segundo": "SELECT id FROM plantas WHERE NOT id IN (SELECT DISTINCT planta_id FROM maquinas)",
+      "iguales": true,
+      "latencia_primero": 0.8457618999964325,
+      "latencia_segundo": 0.8842678000073647
+    },
+    {
+      "id": "manufactura-00003",
+      "pregunta": "Lista id y capacidad de plantas con capacidad igual a 20, ordenados por capacidad y después id.",
+      "sql_primero": "SELECT id, capacidad FROM plantas WHERE capacidad = 20 ORDER BY capacidad ASC, id ASC",
+      "sql_segundo": "SELECT id, capacidad FROM plantas WHERE capacidad = 20 ORDER BY capacidad ASC, id ASC",
+      "iguales": true,
+      "latencia_primero": 0.8871136000088882,
+      "latencia_segundo": 0.8954185000038706
+    },
+    {
+      "id": "manufactura-00081",
+      "pregunta": "Lista id y unidades de lotes con unidades menor que 20, ordenados por unidades y después id.",
+      "sql_primero": "SELECT l.id, l.unidades FROM lotes AS l WHERE l.unidades < 20 ORDER BY l.unidades ASC, l.id ASC",
+      "sql_segundo": "SELECT l.id, l.unidades FROM lotes AS l WHERE l.unidades < 20 ORDER BY l.unidades ASC, l.id ASC",
+      "iguales": true,
+      "latencia_primero": 1.1703861000132747,
+      "latencia_segundo": 1.3037477000034414
+    },
+    {
+      "id": "manufactura-00031",
+      "pregunta": "Lista id y costo de maquinas con costo mayor que 20, ordenados por costo y después id.",
+      "sql_primero": "SELECT id, costo FROM maquinas WHERE costo > 20 ORDER BY costo DESC, id ASC",
+      "sql_segundo": "SELECT id, costo FROM maquinas WHERE costo > 20 ORDER BY costo DESC, id ASC",
+      "iguales": true,
+      "latencia_primero": 0.9345383000036236,
+      "latencia_segundo": 0.925905000010971
+    },
+    {
+      "id": "manufactura-00101",
+      "pregunta": "Lista id y defectos de lotes con defectos igual a 20, ordenados por defectos y después id.",
+      "sql_primero": "SELECT l.id, l.defectos FROM lotes AS l WHERE l.defectos = 20 ORDER BY l.defectos ASC, l.id DESC",
+      "sql_segundo": "SELECT l.id, l.defectos FROM lotes AS l WHERE l.defectos = 20 ORDER BY l.defectos ASC, l.id DESC",
+      "iguales": true,
+      "latencia_primero": 1.3215543000114849,
+      "latencia_segundo": 1.2973232999938773
+    },
+    {
+      "id": "manufactura-00002",
+      "pregunta": "Lista id y capacidad de plantas con capacidad menor que 20, ordenados por capacidad y después id.",
+      "sql_primero": "SELECT id, capacidad FROM plantas WHERE capacidad < 20 ORDER BY capacidad ASC, id ASC",
+      "sql_segundo": "SELECT id, capacidad FROM plantas WHERE capacidad < 20 ORDER BY capacidad ASC, id ASC",
+      "iguales": true,
+      "latencia_primero": 0.8789396999927703,
+      "latencia_segundo": 0.892665899998974
+    },
+    {
+      "id": "manufactura-00251",
+      "pregunta": "Lista todas las columnas de los registros de inspecciones cuya fecha corresponde a 01/2025, en el orden de columnas del esquema.",
+      "sql_primero": "SELECT * FROM inspecciones WHERE fecha = '2025-01-01'",
+      "sql_segundo": "SELECT * FROM inspecciones WHERE fecha = '2025-01-01'",
+      "iguales": true,
+      "latencia_primero": 0.9402286999975331,
+      "latencia_segundo": 0.8580414000025485
+    },
+    {
+      "id": "manufactura-00099",
+      "pregunta": "Lista id y defectos de lotes con defectos mayor que 20, ordenados por defectos y después id.",
+      "sql_primero": "SELECT l.id, l.defectos FROM lotes AS l WHERE l.defectos > 20 ORDER BY l.defectos DESC, l.id ASC",
+      "sql_segundo": "SELECT l.id, l.defectos FROM lotes AS l WHERE l.defectos > 20 ORDER BY l.defectos DESC, l.id ASC",
+      "iguales": true,
+      "latencia_primero": 1.324641300001531,
+      "latencia_segundo": 1.2814832000003662
+    },
+    {
+      "id": "manufactura-00032",
+      "pregunta": "Lista id y costo de maquinas con costo menor que 20, ordenados por costo y después id.",
+      "sql_primero": "SELECT id, costo FROM maquinas WHERE costo < 20 ORDER BY costo ASC, id ASC",
+      "sql_segundo": "SELECT id, costo FROM maquinas WHERE costo < 20 ORDER BY costo ASC, id ASC",
+      "iguales": true,
+      "latencia_primero": 0.9305431000102544,
+      "latencia_segundo": 0.9161896000005072
+    },
+    {
+      "id": "manufactura-00112",
+      "pregunta": "Calcula promedio de defectos entre los registros de lotes donde defectos supera 20.",
+      "sql_primero": "SELECT AVG(defectos) AS promedio_defectos FROM lotes WHERE defectos > 20",
+      "sql_segundo": "SELECT AVG(defectos) AS promedio_defectos FROM lotes WHERE defectos > 20",
+      "iguales": true,
+      "latencia_primero": 1.041664700009278,
+      "latencia_segundo": 1.0448095000028843
+    },
+    {
+      "id": "manufactura-00146",
+      "pregunta": "Devuelve exactamente fecha y el mínimo de unidades, una fila por cada valor distinto de fecha en lotes.",
+      "sql_primero": "SELECT fecha, MIN(unidades) FROM lotes GROUP BY fecha",
+      "sql_segundo": "SELECT fecha, MIN(unidades) FROM lotes GROUP BY fecha",
+      "iguales": true,
+      "latencia_primero": 0.6817811999935657,
+      "latencia_segundo": 0.7362128999957349
+    },
+    {
+      "id": "manufactura-00094",
+      "pregunta": "Calcula máximo de unidades entre los registros de lotes donde unidades supera 20.",
+      "sql_primero": "SELECT MAX(unidades) FROM lotes WHERE unidades > 20",
+      "sql_segundo": "SELECT MAX(unidades) FROM lotes WHERE unidades > 20",
+      "iguales": true,
+      "latencia_primero": 0.7141349000012269,
+      "latencia_segundo": 0.695552500008489
+    },
+    {
+      "id": "manufactura-00160",
+      "pregunta": "Devuelve exactamente maquina_id y la diferencia entre máximo y mínimo de defectos, una fila por cada maquina_id en lotes.",
+      "sql_primero": "SELECT m.id AS maquina_id, MAX(l.defectos) - MIN(l.defectos) AS defectos_diferencia FROM lotes AS l JOIN maquinas AS m ON l.maquina_id = m.id GROUP BY m.id",
+      "sql_segundo": "SELECT m.id AS maquina_id, MAX(l.defectos) - MIN(l.defectos) AS defectos_diferencia FROM lotes AS l JOIN maquinas AS m ON l.maquina_id = m.id GROUP BY m.id",
+      "iguales": true,
+      "latencia_primero": 1.9033180999977048,
+      "latencia_segundo": 1.9250205999996979
+    },
+    {
+      "id": "manufactura-00237",
+      "pregunta": "Devuelve exactamente fecha y el mínimo de puntaje, una fila por cada valor distinto de fecha en inspecciones.",
+      "sql_primero": "SELECT fecha, MIN(puntaje) FROM inspecciones GROUP BY fecha",
+      "sql_segundo": "SELECT fecha, MIN(puntaje) FROM inspecciones GROUP BY fecha",
+      "iguales": true,
+      "latencia_primero": 0.7450585999904433,
+      "latencia_segundo": 0.7644364000007045
+    },
+    {
+      "id": "manufactura-00213",
+      "pregunta": "Calcula suma de puntaje entre los registros de inspecciones donde puntaje supera 20.",
+      "sql_primero": "SELECT SUM(puntaje) AS total_puntajes FROM inspecciones WHERE puntaje > 20",
+      "sql_segundo": "SELECT SUM(puntaje) AS total_puntajes FROM inspecciones WHERE puntaje > 20",
+      "iguales": true,
+      "latencia_primero": 1.0661170999956084,
+      "latencia_segundo": 1.018377700005658
+    },
+    {
+      "id": "manufactura-00110",
+      "pregunta": "Calcula cantidad de registros entre los registros de lotes donde defectos supera 20.",
+      "sql_primero": "SELECT COUNT(*) FROM lotes WHERE defectos > 20",
+      "sql_segundo": "SELECT COUNT(*) FROM lotes WHERE defectos > 20",
+      "iguales": true,
+      "latencia_primero": 0.6444231999921612,
+      "latencia_segundo": 0.6382091999985278
+    }
+  ],
+  "cantidad": 39,
+  "iguales": 39,
+  "nota": "No prueba determinismo de entrenamiento ni de todas las plataformas CUDA."
+}

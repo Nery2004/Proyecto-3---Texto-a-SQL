@@ -1,0 +1,4 @@
+modelo,estrategia,dificultad,preguntas,ex_ponderada,latencia_promedio,latencia_maxima,fuera_de_limite,llamadas_ejecutar,reparaciones_exitosas,reparaciones_fallidas,errores
+baseline,callback,dificil,16,0.4375,5.8565838125014125,25.835549499999615,0,16,0,5,9
+baseline,callback,facil,16,0.6875,2.2253262000003815,10.850256999998237,0,16,0,2,5
+baseline,callback,media,16,0.875,2.130145581250872,11.988158400010434,0,16,0,2,2

@@ -1,0 +1,3 @@
+preguntas,ex_ponderada,latencia_promedio,latencia_maxima,fuera_de_limite,llamadas_ejecutar,reparaciones_exitosas,reparaciones_fallidas,modelo,estrategia,carga_segundos
+48,0.625,1.4300582375002098,4.450314100002288,0,0,0,0,baseline,directa,8.195791899997857
+48,0.625,3.404018531250889,25.835549499999615,0,48,0,9,baseline,callback,8.195791899997857

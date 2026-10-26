@@ -1,7 +1,7 @@
 * text=auto
 *.py text eol=lf
 *.json text eol=lf
-*.jsonl text eol=lf
+*.jsonl -text
 *.md text eol=lf
 *.ipynb text eol=lf
 *.pdf binary

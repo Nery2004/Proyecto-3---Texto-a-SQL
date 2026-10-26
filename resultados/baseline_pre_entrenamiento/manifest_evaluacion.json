@@ -1,0 +1,14 @@
+{
+  "dataset": "datos/validacion/evaluacion_48.jsonl",
+  "dataset_sha256": "a73b423a4e7955516bfe785517fb0b4d7617417d81a5b4c17a4360ea6cda0d8e",
+  "prompt_version": "mysql-es-v1",
+  "configuraciones": [
+    {
+      "modelo_base": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+      "adapter": "../adapter/",
+      "usar_adapter": false,
+      "semilla": 2026
+    }
+  ],
+  "nota_autoria": "Propuestas IA; revisar autoría humana antes de entrega académica"
+}
